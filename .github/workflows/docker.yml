@@ -96,11 +96,11 @@ jobs:
           [ "$RV" = 'wss://demo.example.com:23456' ] || fail "/relay.txt got '$RV'"
           WS_OK=$(curl -si --max-time 8 -H 'Connection: Upgrade' -H 'Upgrade: websocket' -H 'Sec-WebSocket-Version: 13' \
             -H 'Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==' -H 'Origin: https://page.example.com:9999' \
-            "$B/room/SMOKETEST" | head -1 | tr -d '\r')
+            "$B/room/TESTROOM" | head -1 | tr -d '\r')
           echo "$WS_OK" | grep -q '101' || fail "WS with whitelisted origin → $WS_OK (want 101; error frames arrive on the socket)"
           WS_BAD=$(curl -si --max-time 8 -H 'Connection: Upgrade' -H 'Upgrade: websocket' -H 'Sec-WebSocket-Version: 13' \
             -H 'Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==' -H 'Origin: https://evil.example.net' \
-            "$B/room/SMOKETEST" | head -1 | tr -d '\r')
+            "$B/room/TESTROOM" | head -1 | tr -d '\r')
           echo "$WS_BAD" | grep -q '403' || fail "WS with unknown origin → $WS_BAD (want 403)"
           echo "smoke: RELAY_PUBLIC_URL served + origin whitelist ok"
 
