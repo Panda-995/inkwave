@@ -67,7 +67,7 @@ jobs:
       - name: boot + probe
         run: |
           docker run -d --name inkwave -p 8490:8490 -p 8787:8787 \
-            ghcr.io/${{ github.repository_owner }}/inkwave:sha-${GITHUB_SHA::7}
+            ghcr.io/panda-995/inkwave:sha-${GITHUB_SHA::7}
           for i in $(seq 1 30); do
             curl -sf -o /dev/null http://127.0.0.1:8490/ && break || sleep 2
           done
