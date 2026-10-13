@@ -51,3 +51,30 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+  # Runtime smoke: boot the just-pushed image, verify the web build serves the Chinese page and
+  # that the wrangler/workerd relay actually comes up on :8787 (an HTTP response of any code
+  # proves workerd is listening; the relay itself only speaks WebSocket).
+  smoke:
+    needs: image
+    runs-on: ubuntu-latest
+    steps:
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: boot + probe
+        run: |
+          docker run -d --name inkwave -p 8490:8490 -p 8787:8787 \
+            ghcr.io/${{ github.repository_owner }}/inkwave:sha-${GITHUB_SHA::7}
+          for i in $(seq 1 30); do
+            curl -sf -o /dev/null http://127.0.0.1:8490/ && break || sleep 2
+          done
+          TITLE=$(curl -sf http://127.0.0.1:8490/)
+          echo "$TITLE" | grep -q 'INKWAVE — 占地大乱斗' || { echo 'web page missing Chinese title'; docker logs inkwave; exit 1; }
+          curl -sf -o /dev/null http://127.0.0.1:8490/src/main.js || { echo 'module serving broken'; docker logs inkwave; exit 1; }
+          CODE=$(curl -s -o /dev/null -w '%{http_code}' --max-time 10 http://127.0.0.1:8787/)
+          [ "$CODE" != "000" ] || { echo 'relay port not answering'; docker logs inkwave; exit 1; }
+          echo "smoke ok: web served, relay answered HTTP $CODE"
+          docker logs inkwave 2>&1 | tail -20
