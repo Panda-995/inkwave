@@ -77,7 +77,7 @@ export class DioramaOverlay {
     this.planT = h('b', { class: 'iw-dio-plan__t' });
     this.planS = h('small', { class: 'iw-dio-plan__s' });
     this.plan = h('div', { class: 'iw-dio-plan' },
-      h('span', { class: 'iw-dio-plan__ring' }, this.planN, h('small', null, 'RESPAWN')),
+      h('span', { class: 'iw-dio-plan__ring' }, this.planN, h('small', null, '重生')),
       h('span', { class: 'iw-dio-plan__txt' }, this.planT, this.planS));
     this.el = h('div', { class: 'iw-dio', 'aria-hidden': 'true' },
       h('div', { class: 'iw-dio__tilt iw-dio__tilt--top' }), h('div', { class: 'iw-dio__tilt iw-dio__tilt--bot' }),
@@ -88,7 +88,7 @@ export class DioramaOverlay {
       // (over the pins: what you just splatted is usually right in front of you — under your own badge)
       h('div', { class: 'iw-dio__dms' }, this.dms.map((d) => d.el)),
       this.cursor,
-      h('div', { class: 'iw-dio__head' }, h('small', { class: 'iw-dio__kicker' }, 'STAGE MAP'), this.title, this.when),
+      h('div', { class: 'iw-dio__head' }, h('small', { class: 'iw-dio__kicker' }, '场地地图'), this.title, this.when),
       this.plan,
       this.foot);
     root.prepend(this.el);
@@ -101,14 +101,14 @@ export class DioramaOverlay {
   _pin(i) {
     const self = i === 4, home = i === 3, beacon = i >= 5;
     const icon = h('span', { class: 'iw-pin__icon', html: self ? ARROW : home ? HOME_ICON : beacon ? (SUB_ICONS.beacon || '') : '' });
-    const name = h('span', { class: 'iw-pin__name' }, self ? 'YOU' : home ? 'BASE' : beacon ? 'BEACON' : '');
+    const name = h('span', { class: 'iw-pin__name' }, self ? '你' : home ? '基地' : beacon ? '信标' : '');
     const state = h('span', { class: 'iw-pin__state' });
     const el = h('div', { class: 'iw-pin' + (self ? ' iw-pin--self' : '') + (home ? ' iw-pin--home' : '') + (beacon ? ' iw-pin--beacon' : '') },
       h('span', { class: 'iw-pin__ground' }), h('span', { class: 'iw-pin__stem' }),
       h('span', { class: 'iw-pin__badge' }, icon, h('span', { class: 'iw-pin__pulse' })),
       self ? null : h('span', { class: 'iw-pin__key', html: keycap(String(beacon ? i % 10 : i + 1)) }),
       name, state,
-      self || home ? null : h('span', { class: 'iw-pin__queue' }, 'ON RESPAWN'));
+      self || home ? null : h('span', { class: 'iw-pin__queue' }, '重生起跳'));
     return { el, icon, name, state, x: 0, y: 0, vis: false, key: '', weapon: null, target: null, ok: false, queued: false };
   }
 
@@ -145,7 +145,7 @@ export class DioramaOverlay {
       let tgt = null, ok = false, label = '', st = '', dead = false, weapon = null;
       if (i >= 5) {
         const b = beacons[i - 5];
-        if (b) { tgt = b.pos; ok = true; label = 'BEACON'; st = b.uses > 1 ? '×' + b.uses : ''; }
+        if (b) { tgt = b.pos; ok = true; label = '信标'; st = b.uses > 1 ? '×' + b.uses : ''; }
         p.target = b || null;
         p.queued = !!(q && b && q.kind === 'beacon' && q.target === b);
       } else if (i < 3) {
@@ -330,7 +330,7 @@ export class DioramaOverlay {
       const col = active && held ? (G.teamHex?.[z.owner] || '#fff') : '#dcd7e6';
       // a two-zone centre: one label (on its first zone), the other zone just its icon
       const first = z.kind !== 'center' || Z.zones.find((q) => q.kind === 'center') === z;
-      const label = !first ? '' : z.kind === 'center' ? 'CENTRE' : z.home === me.team ? 'YOUR SIDE' : 'ENEMY SIDE';
+      const label = !first ? '' : z.kind === 'center' ? '中心' : z.home === me.team ? '我方半场' : '敌方半场';
       const key = `${active ? 1 : 0}|${col}|${label}`;
       if (key === tg.key) continue;
       tg.key = key;
@@ -366,15 +366,15 @@ export class DioramaOverlay {
 
   _head() {
     const m = G.game?.mapDef;
-    this.title.textContent = (m?.name || 'Stage').toUpperCase();
-    this.when.textContent = G.game?.time === 'dusk' ? 'DUSK' : 'DAY';
+    this.title.textContent = (m?.name || '场地').toUpperCase();
+    this.when.textContent = G.game?.time === 'dusk' ? '黄昏' : '白天';
     const pad = G.input?.lastDevice === 'pad';
     const plan = !!this._planning;
     this.foot.innerHTML = pad
-      ? richText(plan ? 'Right stick to point · A or D-pad to plan your Super Jump · release VIEW to close' : 'Right stick to point · A or D-pad to Super Jump · release VIEW to close')
-      : `${keycap('1')}${keycap('2')}${keycap('3')} <span>${plan ? 'Plan a jump to a teammate' : 'Super Jump to a teammate'}</span> ${keycap('4')} <span>${plan ? 'Base (no jump)' : 'Base'}</span>` +
-        (G.match?.local && beaconsOf(G.match.local.team).length ? ` ${keycap('5')}–${keycap('0')} <span>Beacons</span>` : '') +
-        ` <em>·</em> <span>Point + click a pin</span> <em>·</em> <span>release</span> ${keycap('TAB')}`;
+      ? richText(plan ? '右摇杆指向 · 按 A 或十字键预约超级跳跃 · 松开 VIEW 键关闭' : '右摇杆指向 · 按 A 或十字键超级跳跃 · 松开 VIEW 键关闭')
+      : `${keycap('1')}${keycap('2')}${keycap('3')} <span>${plan ? '预约跳向队友' : '超级跳跃至队友'}</span> ${keycap('4')} <span>${plan ? '基地（不起跳）' : '基地'}</span>` +
+        (G.match?.local && beaconsOf(G.match.local.team).length ? ` ${keycap('5')}–${keycap('0')} <span>信标</span>` : '') +
+        ` <em>·</em> <span>指向并点击图钉</span> <em>·</em> <span>松开</span> ${keycap('TAB')}`;
   }
 
   // death markers: a squid-skull in the victim's ink on the spot, fading with the record (main.js G.deathMarks)
@@ -405,8 +405,8 @@ export class DioramaOverlay {
     const first = this._last.plan == null;
     this._last.plan = key;
     this.plan.classList.toggle('is-queued', !!q);
-    this.planT.textContent = q ? `SUPER JUMP \u2192 ${q.name.toUpperCase()}` : 'PLAN YOUR SUPER JUMP';
-    this.planS.textContent = q ? 'Launches on respawn \u00b7 pick again to change' : 'Pick a teammate or beacon to jump to on respawn';
+    this.planT.textContent = q ? `超级跳跃 \u2192 ${q.name.toUpperCase()}` : '计划你的超级跳跃';
+    this.planS.textContent = q ? '重生时自动起跳 \u00b7 重新选择可更改' : '选择队友或信标，重生后跳过去';
     if (!first) this.plan.animate([{ scale: '1.08' }, { scale: '1' }], { duration: 320, easing: 'cubic-bezier(.34,1.8,.64,1)' });
   }
 }

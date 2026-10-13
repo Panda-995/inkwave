@@ -178,7 +178,7 @@ export class PlayerController {
     if (a.alive) return false;
     let q = null;
     if (kind === 'ally') { if (target && target.team === a.team && target !== a && target.alive) q = { kind, target, name: target.name }; }
-    else if (kind === 'beacon') { if (target && target.state === 'beacon' && target.team === a.team) q = { kind, target, name: target.owner === a ? 'Your beacon' : `${target.owner?.name || 'Team'}'s beacon` }; }
+    else if (kind === 'beacon') { if (target && target.state === 'beacon' && target.team === a.team) q = { kind, target, name: target.owner === a ? '你的信标' : `${target.owner?.name || '队友'} 的信标` }; }
     if (kind === 'base') {
       const had = !!this.jumpQueue;
       this.jumpQueue = null;
@@ -196,7 +196,7 @@ export class PlayerController {
   _queueGone(q) {
     if (!q) return null;
     if (q.kind === 'ally') return q.target && q.target.alive ? null : `${q.name} was splatted`;
-    if (q.kind === 'beacon') return q.target && q.target.state === 'beacon' ? null : 'The jump beacon is gone';
+    if (q.kind === 'beacon') return q.target && q.target.state === 'beacon' ? null : '跳跃信标不见了';
     return null;
   }
 

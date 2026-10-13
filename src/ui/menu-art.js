@@ -57,24 +57,24 @@ export const awardIcon = (id) => AWARD_ICONS[id] || AWARD_ICONS.star;
 
 // ================================================================================== awards
 export const AWARDS = {
-  mvp: { label: 'MVP', metal: 'gold', icon: 'star', desc: 'Best all-round score on the winning team' },
-  turf: { label: 'TURF KING', metal: 'gold', icon: 'crown', desc: 'Most turf inked in the match' },
-  splats: { label: 'TOP SPLATTER', metal: 'silver', icon: 'splat', desc: 'Most splats in the match' },
-  inker: { label: 'TOP INKER', metal: 'silver', icon: 'roller', desc: 'Most turf inked on their team' },
-  untouchable: { label: 'UNTOUCHABLE', metal: 'bronze', icon: 'shield', desc: 'Never got splatted' },
-  survivor: { label: 'SURVIVOR', metal: 'bronze', icon: 'buoy', desc: 'Splatted the fewest times' },
-  pure: { label: 'PURE PAINTER', metal: 'bronze', icon: 'brush', desc: 'Top-3 turf without splatting anyone' },
+  mvp: { label: 'MVP', metal: 'gold', icon: 'star', desc: '获胜队伍中综合表现最佳' },
+  turf: { label: '涂地王', metal: 'gold', icon: 'crown', desc: '全场涂地面积最高' },
+  splats: { label: '击倒王', metal: 'silver', icon: 'splat', desc: '全场击倒数最多' },
+  inker: { label: '涂地能手', metal: 'silver', icon: 'roller', desc: '队内涂地面积最高' },
+  untouchable: { label: '无人能挡', metal: 'bronze', icon: 'shield', desc: '整场未被击倒' },
+  survivor: { label: '生存者', metal: 'bronze', icon: 'buoy', desc: '被击倒次数最少' },
+  pure: { label: '纯涂画手', metal: 'bronze', icon: 'brush', desc: '涂地前三且零击倒' },
 };
 const AWARD_ORDER = ['mvp', 'turf', 'splats', 'inker', 'untouchable', 'survivor', 'pure'];
 // boss mode (co-op: one squad, no team split — the MVP is given win or lose)
 export const BOSS_AWARDS = {
-  mvp: { label: 'MVP', metal: 'gold', icon: 'star', desc: 'Best all-round score against HULLBREAKER' },
-  heavy: { label: 'HEAVY HITTER', metal: 'gold', icon: 'pow', desc: 'Dealt the most damage to the boss' },
-  crit: { label: 'SHELL CRACKER', metal: 'silver', icon: 'crit', desc: 'Most weak-point hits' },
-  brood: { label: 'BROOD BUSTER', metal: 'silver', icon: 'splat', desc: 'Popped the most crablets' },
-  unsinkable: { label: 'UNSINKABLE', metal: 'bronze', icon: 'anchor', desc: 'Never got splatted' },
-  survivor: { label: 'SURVIVOR', metal: 'bronze', icon: 'buoy', desc: 'Splatted the fewest times' },
-  cleaner: { label: 'CLEANUP CREW', metal: 'bronze', icon: 'roller', desc: 'Painted over the most boss ink' },
+  mvp: { label: 'MVP', metal: 'gold', icon: 'star', desc: '对战破舱者综合表现最佳' },
+  heavy: { label: '重炮手', metal: 'gold', icon: 'pow', desc: '对头目造成最高伤害' },
+  crit: { label: '碎甲专家', metal: 'silver', icon: 'crit', desc: '命中弱点次数最多' },
+  brood: { label: '蟹崽克星', metal: 'silver', icon: 'splat', desc: '击破蟹崽数量最多' },
+  unsinkable: { label: '永不沉没', metal: 'bronze', icon: 'anchor', desc: '整场未被击倒' },
+  survivor: { label: '生存者', metal: 'bronze', icon: 'buoy', desc: '被击倒次数最少' },
+  cleaner: { label: '清墨先锋', metal: 'bronze', icon: 'roller', desc: '覆盖头目墨汁最多' },
 };
 const BOSS_ORDER = ['mvp', 'heavy', 'crit', 'brood', 'unsinkable', 'survivor', 'cleaner'];
 /** Boss-mode awards from the final stats: players [{ damage, weakHits, splats, deaths, turf, isSelf }]. */
@@ -85,28 +85,28 @@ export function computeBossAwards(players = []) {
   const maxOf = (k) => (P.length ? Math.max(...P.map((p) => p[k])) : 0);
   if (P.length) {
     const md = maxOf('dmg'), mw = maxOf('weak'), ms = maxOf('splats'), mt = maxOf('turf'), mD = Math.max(1, maxOf('deaths'));
-    if (md > 0) P.filter((p) => p.dmg === md).forEach((p) => give(p, 'heavy', `${fmtInt(p.dmg)} damage`));
-    if (mw >= 3) P.filter((p) => p.weak === mw).forEach((p) => give(p, 'crit', `${mw} weak-point hits`));
-    if (ms >= 2) P.filter((p) => p.splats === ms).forEach((p) => give(p, 'brood', `${ms} crablets`));
-    if (mt > 0) P.filter((p) => p.turf === mt).forEach((p) => give(p, 'cleaner', `${fmtInt(p.turf)}p inked`));
+    if (md > 0) P.filter((p) => p.dmg === md).forEach((p) => give(p, 'heavy', `伤害 ${fmtInt(p.dmg)}`));
+    if (mw >= 3) P.filter((p) => p.weak === mw).forEach((p) => give(p, 'crit', `命中弱点 ${mw} 次`));
+    if (ms >= 2) P.filter((p) => p.splats === ms).forEach((p) => give(p, 'brood', `击破蟹崽 ${ms} 只`));
+    if (mt > 0) P.filter((p) => p.turf === mt).forEach((p) => give(p, 'cleaner', `涂地 ${fmtInt(p.turf)}p`));
     const active = P.filter((p) => p.dmg > 0 || p.turf >= 30);
     const zero = active.filter((p) => p.deaths === 0);
-    if (zero.length && zero.length <= 3) zero.forEach((p) => give(p, 'unsinkable', 'Never splatted'));
+    if (zero.length && zero.length <= 3) zero.forEach((p) => give(p, 'unsinkable', '从未被击倒'));
     else if (!zero.length && active.length) {
       const m = Math.min(...active.map((p) => p.deaths));
       const s = active.filter((p) => p.deaths === m);
-      if (s.length === 1) give(s[0], 'survivor', `Splatted ${m}×`);
+      if (s.length === 1) give(s[0], 'survivor', `被击倒 ${m}×`);
     }
     const score = (p) => p.dmg / Math.max(1, md) + 0.35 * (p.weak / Math.max(1, mw)) + 0.2 * (p.splats / Math.max(1, ms)) + 0.15 * (p.turf / Math.max(1, mt)) - 0.25 * (p.deaths / mD);
     const cand = P.filter((p) => p.dmg > 0 || p.turf > 0);
-    if (cand.length) give(cand.reduce((b, p) => (score(p) > score(b) + 1e-9 ? p : b)), 'mvp', 'Top all-round score');
+    if (cand.length) give(cand.reduce((b, p) => (score(p) > score(b) + 1e-9 ? p : b)), 'mvp', '综合评分最高');
     for (const list of by) list.sort((x, y) => BOSS_ORDER.indexOf(x.id) - BOSS_ORDER.indexOf(y.id));
   }
   return { byPlayer: by, match: [] };
 }
 export const MATCH_TAGS = {
-  close: { id: 'close', label: 'PHOTO FINISH', icon: 'stopwatch' },
-  landslide: { id: 'landslide', label: 'LANDSLIDE', icon: 'wave' },
+  close: { id: 'close', label: '毫厘之差', icon: 'stopwatch' },
+  landslide: { id: 'landslide', label: '压倒性胜利', icon: 'wave' },
 };
 
 /**
@@ -122,28 +122,28 @@ export function computeAwards(players = [], { win = true, percents = [50, 50] } 
     // Turf King — most turf in the lobby (ties share the crown)
     const mt = maxOf('turf');
     const kings = mt > 0 ? P.filter((p) => p.turf === mt) : [];
-    kings.forEach((p) => give(p, 'turf', `${fmtInt(p.turf)}p inked`));
+    kings.forEach((p) => give(p, 'turf', `涂地 ${fmtInt(p.turf)}p`));
     // Top Inker — best painter on each team that doesn't already hold the crown
     for (const t of [0, 1]) {
       const team = P.filter((p) => p.team === t);
       if (!team.length || team.some((p) => kings.includes(p))) continue;
       const m = maxOf('turf', team);
-      if (m > 0) team.filter((p) => p.turf === m).forEach((p) => give(p, 'inker', `${fmtInt(p.turf)}p inked`));
+      if (m > 0) team.filter((p) => p.turf === m).forEach((p) => give(p, 'inker', `涂地 ${fmtInt(p.turf)}p`));
     }
     // Top Splatter
     const ms = maxOf('splats');
-    if (ms > 0) P.filter((p) => p.splats === ms).forEach((p) => give(p, 'splats', `${ms} splat${ms === 1 ? '' : 's'}`));
+    if (ms > 0) P.filter((p) => p.splats === ms).forEach((p) => give(p, 'splats', `${ms} 次击倒`));
     // Untouchable (never splatted — only special when few managed it) / Survivor (unique fewest)
     const active = P.filter((p) => p.turf >= 30 || p.splats > 0);
     const zero = active.filter((p) => p.deaths === 0);
-    if (zero.length && zero.length <= 3) zero.forEach((p) => give(p, 'untouchable', 'Never splatted'));
+    if (zero.length && zero.length <= 3) zero.forEach((p) => give(p, 'untouchable', '从未被击倒'));
     else if (!zero.length && active.length) {
       const md = Math.min(...active.map((p) => p.deaths));
       const s = active.filter((p) => p.deaths === md);
-      if (s.length === 1) give(s[0], 'survivor', `Splatted ${md}×`);
+      if (s.length === 1) give(s[0], 'survivor', `被击倒 ${md}×`);
     }
     // Pure Painter — top-3 turf with zero splats
-    [...P].sort((a, b) => b.turf - a.turf).slice(0, 3).filter((p) => p.splats === 0 && p.turf > 0).forEach((p) => give(p, 'pure', `${fmtInt(p.turf)}p · 0 splats`));
+    [...P].sort((a, b) => b.turf - a.turf).slice(0, 3).filter((p) => p.splats === 0 && p.turf > 0).forEach((p) => give(p, 'pure', `${fmtInt(p.turf)}p · 0 击倒`));
     // MVP — best normalised all-round score on the winning team
     const self = P.find((p) => p.isSelf);
     const selfTeam = self ? self.team : 0;
@@ -153,7 +153,7 @@ export function computeAwards(players = [], { win = true, percents = [50, 50] } 
     const winners = P.filter((p) => p.team === wt && (p.turf > 0 || p.splats > 0));
     if (winners.length) {
       const best = winners.reduce((b, p) => (score(p) > score(b) + 1e-9 || (Math.abs(score(p) - score(b)) < 1e-9 && p.turf > b.turf) ? p : b));
-      give(best, 'mvp', 'Top all-round score');
+      give(best, 'mvp', '综合评分最高');
     }
     for (const list of by) list.sort((x, y) => AWARD_ORDER.indexOf(x.id) - AWARD_ORDER.indexOf(y.id));
   }
@@ -162,7 +162,7 @@ export function computeAwards(players = [], { win = true, percents = [50, 50] } 
   if (pa <= 1.0001 && pb <= 1.0001) { pa *= 100; pb *= 100; }
   const margin = Math.abs(pa - pb);
   const match = [];
-  if (margin < 3) match.push({ ...MATCH_TAGS.close, value: `${margin.toFixed(1)}% margin` });
+  if (margin < 3) match.push({ ...MATCH_TAGS.close, value: `相差 ${margin.toFixed(1)}%` });
   else if (margin >= 20) match.push({ ...MATCH_TAGS.landslide, value: `+${margin.toFixed(1)}%` });
   return { byPlayer: by, match };
 }
@@ -184,11 +184,11 @@ export function awardBadge(aw) {
 
 // ================================================================================== ranks
 export const RANK_TIERS = [
-  { lv: 1, name: 'Fresh Recruit', cls: 'is-t0' },
-  { lv: 5, name: 'Turf Scrapper', cls: 'is-t1' },
-  { lv: 10, name: 'Ink Slinger', cls: 'is-t2' },
-  { lv: 20, name: 'Splat Veteran', cls: 'is-t3' },
-  { lv: 30, name: 'Tide Legend', cls: 'is-t4' },
+  { lv: 1, name: '新兵', cls: 'is-t0' },
+  { lv: 5, name: '涂地斗士', cls: 'is-t1' },
+  { lv: 10, name: '喷墨高手', cls: 'is-t2' },
+  { lv: 20, name: '百战老兵', cls: 'is-t3' },
+  { lv: 30, name: '潮汐传奇', cls: 'is-t4' },
 ];
 export const rankTier = (level) => RANK_TIERS.reduce((acc, r, i) => (level >= r.lv ? i : acc), 0);
 /** Shield emblem with one pip per tier (tier 0..4). Colour via CSS (--rk). */
@@ -556,8 +556,8 @@ function previewLook(ctx, pad) {
   let v = +ctx.value || 1, ph = 0, shown = v;
   const set = (nv) => {
     v = +nv || 1;
-    if (pad) stat.innerHTML = `Full-stick 360° turn in <b>${(TAU / (PAD_YAW_RATE * v)).toFixed(2)} s</b>`;
-    else stat.innerHTML = `<b>${fmtInt(TAU / (MOUSE_RAD_PER_PX * v))} px</b> of mouse travel per 360° turn`;
+    if (pad) stat.innerHTML = `摇杆推满转一圈需 <b>${(TAU / (PAD_YAW_RATE * v)).toFixed(2)} s</b>`;
+    else stat.innerHTML = `鼠标转动一圈需移动 <b>${fmtInt(TAU / (MOUSE_RAD_PER_PX * v))} px</b>`;
   };
   set(v);
   return {
@@ -582,7 +582,7 @@ function previewInvert(ctx) {
       <g transform="translate(160 90)"><circle r="11" fill="none" stroke="#fff" stroke-width="4"/><circle r="11" fill="none" stroke="${K}" stroke-width="1.5"/><circle r="2.6" fill="#fff" stroke="${K}" stroke-width="1.2"/></g>`, 'iw-pv-inv__screen')}
     <div class="iw-pv-cap"></div>` });
   const cap = el.querySelector('.iw-pv-cap');
-  const set = (v) => { el.classList.toggle('is-on', !!v); cap.innerHTML = v ? 'Push up <b>→ look DOWN</b>' : 'Push up <b>→ look UP</b>'; };
+  const set = (v) => { el.classList.toggle('is-on', !!v); cap.innerHTML = v ? '向上推 <b>→ 视线向下</b>' : '向上推 <b>→ 视线向上</b>'; };
   set(ctx.value);
   return { el, set };
 }
@@ -616,7 +616,7 @@ function previewFov(ctx) {
     wedgeEl.setAttribute('d', wedge(cur));
     let n = 0;
     tEls.forEach((g, i) => { const inside = Math.abs(T[i][0]) <= cur / 2 && T[i][1] <= R; g.classList.toggle('is-in', inside); if (inside) n++; });
-    if (n !== lastN) { lastN = n; cap.innerHTML = `<b>${n} of ${T.length}</b> squidkids in view`; }
+    if (n !== lastN) { lastN = n; cap.innerHTML = `视野内有 <b>${n} / ${T.length}</b> 只乌贼小子`; }
   };
   apply();
   return {
@@ -627,7 +627,7 @@ function previewFov(ctx) {
 }
 
 function previewQuality(ctx) {
-  const tiers = [['low', 'LOW'], ['medium', 'MED'], ['high', 'HIGH'], ['ultra', 'ULTRA']];
+  const tiers = [['low', '低'], ['medium', '中'], ['high', '高'], ['ultra', '极高']];
   const ladder = h('div', { class: 'iw-pv-ladder' }, tiers.map(([id, lab], i) => h('span', { class: 'iw-pv-ladder__col', 'data-q': id, style: { '--h': (0.3 + i * 0.233).toFixed(3) } }, h('i'), h('b', null, lab))));
   const chips = h('div', { class: 'iw-pv-chips' });
   const el = h('div', { class: 'iw-pv iw-pv--quality' }, ladder, chips);
@@ -636,15 +636,15 @@ function previewQuality(ctx) {
     const q = Q[v] || Q.high || {};
     ladder.querySelectorAll('.iw-pv-ladder__col').forEach((c) => c.classList.toggle('is-on', c.dataset.q === v));
     const rows = [
-      ['Pixel density', `up to ${(+q.pixelRatio || 1).toFixed(q.pixelRatio % 1 ? 2 : 1).replace(/0$/, '')}×`],
-      ['Shadow map', `${q.shadowSize || 0}px`],
-      ['Anti-aliasing', q.msaa ? `${q.msaa}× MSAA` : 'Off'],
-      ['Ink detail', `${Math.round((q.paintAtlas || 2048) / 1024)}K atlas`],
-      ['Ambient occlusion', q.ao ? 'On' : 'Off'],
-      ['Particles', `${Math.round((q.particles ?? 1) * 100)}%`],
+      ['像素密度', `最高 ${(+q.pixelRatio || 1).toFixed(q.pixelRatio % 1 ? 2 : 1).replace(/0$/, '')}×`],
+      ['阴影贴图', `${q.shadowSize || 0}px`],
+      ['抗锯齿', q.msaa ? `${q.msaa}× MSAA` : '关'],
+      ['墨汁细节', `${Math.round((q.paintAtlas || 2048) / 1024)}K 贴图`],
+      ['环境光遮蔽', q.ao ? '开' : '关'],
+      ['粒子效果', `${Math.round((q.particles ?? 1) * 100)}%`],
     ];
     chips.innerHTML = '';
-    rows.forEach(([k, val], i) => chips.appendChild(h('span', { class: 'iw-pv-chip' + (/Off|0%/.test(val) ? ' is-off' : ''), style: { '--i': i } }, h('small', null, k), h('b', null, val))));
+    rows.forEach(([k, val], i) => chips.appendChild(h('span', { class: 'iw-pv-chip' + (/关|0%/.test(val) ? ' is-off' : ''), style: { '--i': i } }, h('small', null, k), h('b', null, val))));
   };
   set(ctx.value);
   return { el, set };
@@ -659,7 +659,7 @@ function previewShadows(ctx) {
     <g transform="translate(160 74) scale(.5)" style="color:var(--a)">${SQUID.replace('class="iw-ico iw-squid"', 'x="0" y="0" width="64" height="64"')}</g>
     <path class="iw-fa" d="M60 150 q20 -9 40 0 q10 6 -6 12 q-20 7 -34 -2 q-8 -6 0 -10z"/>`) + '<div class="iw-pv-cap"></div>' });
   const cap = el.querySelector('.iw-pv-cap');
-  const set = (v) => { el.classList.toggle('is-on', !!v); cap.innerHTML = v ? 'Soft sun shadows <b>ON</b>' : 'Shadows <b>OFF</b> — faster on older machines'; };
+  const set = (v) => { el.classList.toggle('is-on', !!v); cap.innerHTML = v ? '柔和的阳光阴影 <b>开</b>' : '阴影 <b>关</b> — 旧设备上更流畅'; };
   set(ctx.value);
   return { el, set };
 }
@@ -675,7 +675,7 @@ function previewBloom(ctx) {
       <g transform="translate(136 66) scale(.75)" style="color:#fff">${SPECIAL_ICONS.slam.replace('class="iw-ico "', 'x="0" y="0" width="64" height="64"')}</g>
       <rect x="1" y="1" width="318" height="178" rx="14" fill="none" stroke="${K}" stroke-width="3"/></svg><div class="iw-pv-cap"></div>` });
   const cap = el.querySelector('.iw-pv-cap');
-  const set = (v) => { el.classList.toggle('is-on', !!v); cap.innerHTML = v ? 'Bright ink and specials <b>glow</b>' : 'Glow <b>OFF</b>'; };
+  const set = (v) => { el.classList.toggle('is-on', !!v); cap.innerHTML = v ? '明亮的墨汁与特殊武器会<b>发光</b>' : '发光 <b>关</b>'; };
   set(ctx.value);
   return { el, set };
 }
@@ -690,7 +690,7 @@ function hudFrame(inner) {
 function previewFps(ctx) {
   const el = h('div', { class: 'iw-pv iw-pv--fps', html: hudFrame(`<g class="iw-pv-pop"><rect x="12" y="10" width="58" height="18" rx="6" fill="${K}"/><text x="41" y="23" text-anchor="middle" font-family="Rubik, sans-serif" font-weight="800" font-size="10.5" fill="#7dffa8">60 FPS</text></g>`) + '<div class="iw-pv-cap"></div>' });
   const cap = el.querySelector('.iw-pv-cap');
-  const set = (v) => { el.classList.toggle('is-on', !!v); cap.innerHTML = v ? 'Frame counter <b>shown</b> in matches' : 'Frame counter <b>hidden</b>'; };
+  const set = (v) => { el.classList.toggle('is-on', !!v); cap.innerHTML = v ? '比赛中<b>显示</b>帧数计数器' : '帧数计数器<b>隐藏</b>'; };
   set(ctx.value);
   return { el, set };
 }
@@ -699,18 +699,18 @@ function previewMinimap(ctx) {
       <path class="iw-fa" d="M238 118 q10 -6 20 0 q6 5 -4 10 q-10 4 -16 -2z M244 140 q9 -5 16 2 q4 6 -6 8 q-9 1 -10 -10z"/><path class="iw-fb" d="M280 112 q9 -4 16 2 q4 6 -6 9 q-9 2 -10 -11z M276 140 q10 -6 20 1 q5 6 -6 10 q-11 2 -14 -11z"/>
       <circle cx="252" cy="132" r="4" fill="#fff" stroke="${K}" stroke-width="2"/></g>`) + '<div class="iw-pv-cap"></div>' });
   const cap = el.querySelector('.iw-pv-cap');
-  const set = (v) => { el.classList.toggle('is-on', !!v); cap.innerHTML = v ? 'Turf minimap <b>in the corner</b>' : 'Minimap <b>hidden</b> — hold TAB for the big map'; };
+  const set = (v) => { el.classList.toggle('is-on', !!v); cap.innerHTML = v ? '涂地小地图<b>显示在角落</b>' : '小地图<b>隐藏</b> — 按住 TAB 查看大地图'; };
   set(ctx.value);
   return { el, set };
 }
 
 function previewShake(ctx) {
-  const el = h('div', { class: 'iw-pv iw-pv--shake', html: `<div class="iw-pv-shake__frame">${hudFrame(`<g transform="translate(212 112)"><g class="iw-pv-boom"><path class="iw-fb" d="${splatShape(0, 0, 22, { seed: 9, arms: 9, drops: 0 }).core}"/><text y="5" text-anchor="middle" font-family="Titan One, sans-serif" font-size="13" fill="#fff" stroke="${K}" stroke-width="3" paint-order="stroke">BOOM</text></g></g>`)}</div><div class="iw-pv-cap"></div>` });
+  const el = h('div', { class: 'iw-pv iw-pv--shake', html: `<div class="iw-pv-shake__frame">${hudFrame(`<g transform="translate(212 112)"><g class="iw-pv-boom"><path class="iw-fb" d="${splatShape(0, 0, 22, { seed: 9, arms: 9, drops: 0 }).core}"/><text y="5" text-anchor="middle" font-family="Titan One, sans-serif" font-size="13" fill="#fff" stroke="${K}" stroke-width="3" paint-order="stroke">轰！</text></g></g>`)}</div><div class="iw-pv-cap"></div>` });
   const frame = el.querySelector('.iw-pv-shake__frame');
   const boom = el.querySelector('.iw-pv-boom');
   const cap = el.querySelector('.iw-pv-cap');
   let v = +ctx.value, t = 0.6;
-  const set = (nv) => { v = clamp(+nv || 0); cap.innerHTML = v <= 0 ? 'Screen shake <b>OFF</b>' : `Shake strength <b>${Math.round(v * 100)}%</b>`; };
+  const set = (nv) => { v = clamp(+nv || 0); cap.innerHTML = v <= 0 ? '镜头震动 <b>关</b>' : `震动强度 <b>${Math.round(v * 100)}%</b>`; };
   set(v);
   return {
     el, set,
@@ -742,7 +742,7 @@ function previewAudio(ctx, key) {
   const set = (nv, ss) => {
     v = clamp(+nv || 0); if (ss) s = ss;
     const e = eff();
-    cap.innerHTML = key === 'master' ? `Overall output <b>${Math.round(v * 100)}%</b>` : `Heard at <b>${Math.round(e * 100)}%</b> after master volume`;
+    cap.innerHTML = key === 'master' ? `总音量 <b>${Math.round(v * 100)}%</b>` : `计入总音量后实际听到 <b>${Math.round(e * 100)}%</b>`;
     el.classList.toggle('is-mute', e <= 0.001);
   };
   set(v);
@@ -773,7 +773,7 @@ function previewAimAssist(ctx) {
       <path d="M0 -21 V-15 M0 21 V15 M-21 0 H-15 M21 0 H15" stroke="#fff" stroke-width="3.2" stroke-linecap="round"/></g>`) + '<div class="iw-pv-cap"></div>' });
   const xEl = el.querySelector('.iw-pv-aim__x'), trail = el.querySelector('.iw-pv-aim__trail'), cap = el.querySelector('.iw-pv-cap');
   let v = clamp(+ctx.value || 0), t = 0;
-  const set = (nv) => { v = clamp(+nv || 0); cap.innerHTML = v <= 0.001 ? 'Aim assist <b>OFF</b>' : `Pull strength <b>${Math.round(v * 100)}%</b>`; };
+  const set = (nv) => { v = clamp(+nv || 0); cap.innerHTML = v <= 0.001 ? '瞄准辅助 <b>关</b>' : `吸附强度 <b>${Math.round(v * 100)}%</b>`; };
   set(v);
   return {
     el, set,
@@ -790,9 +790,9 @@ function previewAimAssist(ctx) {
 }
 
 function previewAimMouse(ctx) {
-  const el = h('div', { class: 'iw-pv iw-pv--aimm', html: `<div class="iw-pv-aimm__row"><span class="iw-pv-aimm__dev is-pad">${GLYPHS.gamepad}<b>ASSIST</b></span><span class="iw-pv-aimm__dev is-mouse">${mouseGlyph('M')}<b>ASSIST</b></span></div><div class="iw-pv-cap"></div>` });
+  const el = h('div', { class: 'iw-pv iw-pv--aimm', html: `<div class="iw-pv-aimm__row"><span class="iw-pv-aimm__dev is-pad">${GLYPHS.gamepad}<b>辅助</b></span><span class="iw-pv-aimm__dev is-mouse">${mouseGlyph('M')}<b>辅助</b></span></div><div class="iw-pv-cap"></div>` });
   const cap = el.querySelector('.iw-pv-cap');
-  const set = (v) => { el.classList.toggle('is-on', !!v); cap.innerHTML = v ? 'Assist on <b>controller and mouse</b> (lighter on mouse)' : 'Assist on <b>controller only</b>'; };
+  const set = (v) => { el.classList.toggle('is-on', !!v); cap.innerHTML = v ? '<b>手柄与鼠标</b>均开启辅助（鼠标效果较弱）' : '仅<b>手柄</b>开启辅助'; };
   set(ctx.value);
   return { el, set };
 }
@@ -801,7 +801,7 @@ function previewRumble(ctx) {
   const el = h('div', { class: 'iw-pv iw-pv--rumble', html: `<div class="iw-pv-rumble__pad">${GLYPHS.gamepad}<i class="l"></i><i class="r"></i></div><div class="iw-pv-cap"></div>` });
   const pad = el.querySelector('.iw-pv-rumble__pad'), cap = el.querySelector('.iw-pv-cap');
   let v = clamp(+ctx.value || 0), t = 0.4;
-  const set = (nv) => { v = clamp(+nv || 0); cap.innerHTML = v <= 0 ? 'Vibration <b>OFF</b>' : `Rumble strength <b>${Math.round(v * 100)}%</b>`; el.classList.toggle('is-off', v <= 0); };
+  const set = (nv) => { v = clamp(+nv || 0); cap.innerHTML = v <= 0 ? '震动 <b>关</b>' : `震动强度 <b>${Math.round(v * 100)}%</b>`; el.classList.toggle('is-off', v <= 0); };
   set(v);
   return {
     el, set,
@@ -824,8 +824,8 @@ function previewColorblind(ctx) {
   const cb = ctx.cbPalette || { a: '#ffd21a', b: '#2a52ff' };
   const pair = (a, b) => `<span class="iw-pv-pair"><i style="background:${a}"></i><i style="background:${b}"></i></span>`;
   const el = h('div', { class: 'iw-pv iw-pv--cb', html: `
-    <div class="iw-pv-pal iw-pv-pal--std"><small>STANDARD INKS · rotate each match</small><div class="iw-pv-pal__row">${pals.map((p) => pair(p.a, p.b)).join('')}</div><i class="iw-pv-pal__check">${GLYPHS.check}</i></div>
-    <div class="iw-pv-pal iw-pv-pal--cb"><small>COLORBLIND-SAFE · always</small><div class="iw-pv-pal__row">${pair(cb.a, cb.b)}<span class="iw-pv-pal__name">${(cb.names || ['Sun', 'Sea']).join(' vs ')}</span></div><i class="iw-pv-pal__check">${GLYPHS.check}</i></div>` });
+    <div class="iw-pv-pal iw-pv-pal--std"><small>标准墨色 · 每场轮换</small><div class="iw-pv-pal__row">${pals.map((p) => pair(p.a, p.b)).join('')}</div><i class="iw-pv-pal__check">${GLYPHS.check}</i></div>
+    <div class="iw-pv-pal iw-pv-pal--cb"><small>色盲友好配色 · 始终固定</small><div class="iw-pv-pal__row">${pair(cb.a, cb.b)}<span class="iw-pv-pal__name">${(cb.names || ['日光', '海潮']).join(' vs ')}</span></div><i class="iw-pv-pal__check">${GLYPHS.check}</i></div>` });
   const set = (v) => el.classList.toggle('is-on', !!v);
   set(ctx.value);
   return { el, set };
@@ -856,7 +856,7 @@ function previewLength(ctx) {
     v = +v || 180;
     num.textContent = `${Math.floor(v / 60)}:${String(v % 60).padStart(2, '0')}`;
     arc.setAttribute('stroke-dasharray', `${((v / max) * 100).toFixed(1)} 100`);
-    cap.innerHTML = v < 120 ? 'A quick <b>sprint</b> — every second counts' : 'The full <b>turf war</b> — room for comebacks';
+    cap.innerHTML = v < 120 ? '一场快速的<b>闪电战</b> — 分秒必争' : '完整的<b>占地对战</b> — 足够上演翻盘';
     num.classList.remove('is-pop'); void num.offsetWidth; num.classList.add('is-pop'); // eslint-disable-line no-void
   };
   set(ctx.value);
@@ -866,7 +866,7 @@ function previewLength(ctx) {
 function previewLink() {
   const el = h('div', { class: 'iw-pv iw-pv--link', html: `<div class="iw-pv-link__art"><i>${GLYPHS.keyboard}</i><i>${GLYPHS.gamepad}</i></div>
     <div class="iw-pv-link__keys">${keycap('W')}${keycap('A')}${keycap('S')}${keycap('D')}<em>+</em>${mouseGlyph('L')}<em>·</em>${padGlyph('LS')}${padGlyph('RT')}</div>
-    <div class="iw-pv-cap">Every binding for <b>keyboard, mouse and controller</b></div>` });
+    <div class="iw-pv-cap"><b>键盘、鼠标与手柄</b>的全部按键绑定</div>` });
   return { el, set() {} };
 }
 
@@ -878,7 +878,7 @@ function previewTab(ctx) {
 }
 function previewReset() {
   const el = h('div', { class: 'iw-pv iw-pv--tab', html: `<div class="iw-pv-tab__icon iw-pv-tab__icon--reset">${GLYPHS.reset}</div>
-    <div class="iw-pv-cap">Press twice to restore <b>every setting</b> on every tab</div>` });
+    <div class="iw-pv-cap">连按两次，恢复所有页面上的<b>全部设置</b></div>` });
   return { el, set() {} };
 }
 

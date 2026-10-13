@@ -64,7 +64,7 @@ export class NetSession {
 
   _profile() {
     const p = G.game?.profile || {};
-    return { name: (p.name || 'Player').slice(0, 16), weapon: WEAPONS[p.weapon] ? p.weapon : 'shooter', sub: subOf(p.sub), special: specialOf(p.special), style: p.style || null };
+    return { name: (p.name || '玩家').slice(0, 16), weapon: WEAPONS[p.weapon] ? p.weapon : 'shooter', sub: subOf(p.sub), special: specialOf(p.special), style: p.style || null };
   }
 
   // ------------------------------------------------------------------ rooms
@@ -151,7 +151,7 @@ export class NetSession {
         this._broadcastLobby();
       }
     } else if (o.t === 'leave') {
-      const gone = this.lobby.players.find((p) => p.id === o.id) || { id: o.id, name: this._members.get(o.id) || 'Player' };
+      const gone = this.lobby.players.find((p) => p.id === o.id) || { id: o.id, name: this._members.get(o.id) || '玩家' };
       this._members.delete(o.id);
       const hostChanged = o.host && o.host !== this.hostId;
       this.hostId = o.host;
@@ -166,7 +166,7 @@ export class NetSession {
   }
 
   _newPlayer(id, name, o) {
-    return { id, name: (name || 'Player').slice(0, 16), team: 'auto', weapon: WEAPONS[o.weapon] ? o.weapon : 'shooter', sub: subOf(o.sub), special: specialOf(o.special), style: o.style || randomStyle(), ready: false, host: id === this.hostId, ping: 0 };
+    return { id, name: (name || '玩家').slice(0, 16), team: 'auto', weapon: WEAPONS[o.weapon] ? o.weapon : 'shooter', sub: subOf(o.sub), special: specialOf(o.special), style: o.style || randomStyle(), ready: false, host: id === this.hostId, ping: 0 };
   }
 
   // host: honour team requests while keeping ≤ 4 a side, then place everyone still on 'auto' on the smaller side
@@ -284,7 +284,7 @@ export class NetSession {
           // bots carry a random sub / special about half the time, as offline (else their weapon's own)
           const sub = Math.random() < 0.5 ? null : SUB_ORDER[(Math.random() * SUB_ORDER.length) | 0];
           const special = Math.random() < 0.5 ? null : SPECIAL_ORDER[(Math.random() * SPECIAL_ORDER.length) | 0];
-          roster.push({ nid: nid++, owner: this.myId, bot: true, team, slot: slot++, name: names.pop() || 'Bot', weapon: wpn, sub, special, style: randomStyle() });
+          roster.push({ nid: nid++, owner: this.myId, bot: true, team, slot: slot++, name: names.pop() || '机器人', weapon: wpn, sub, special, style: randomStyle() });
         }
       }
     }
@@ -310,7 +310,7 @@ export class NetSession {
       await G.game.startNetMatch(cfg, this.match);
     } catch (e) {
       console.error('[net] match start failed', e);
-      this._fail(new Error('Could not start the match'));
+      this._fail(new Error('无法开始对局'));
       return;
     }
     if (this.isHost) this._markReady(this.myId);

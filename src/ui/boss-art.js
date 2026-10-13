@@ -16,11 +16,11 @@ const CARA = '#a8283f', CARA_D = '#6c1628', CARA_L = '#dc4d61';
 const CLAW = '#c5354c', CLAW_L = '#f07a82';
 const BELLY = '#f1c9a6';
 
-export const BOSS_NAME = 'HULLBREAKER';
-export const BOSS_EPITHET = 'The Rust-Shelled Terror';
-export const BOSS_BLURB = 'A giant hermit crab living in a rusted shipping container. Everyone in the room teams up to sink it before time runs out.';
+export const BOSS_NAME = '破舱者';
+export const BOSS_EPITHET = '锈甲惊魂';
+export const BOSS_BLURB = '一只寄居在锈蚀集装箱里的巨型寄居蟹。全场玩家将齐心协力，在时间耗尽前把它击沉。';
 export const MOVE_LABELS = {
-  slam: 'SLAM!', barrage: 'INCOMING!', sweep: 'SWEEP!', charge: 'CHARGE!', crablets: 'BROOD!', frenzy: 'FRENZY!', open: 'OPEN!',
+  slam: '重砸！', barrage: '弹幕来袭！', sweep: '横扫！', charge: '冲锋！', crablets: '蟹崽出巢！', frenzy: '狂暴！', open: '破甲！',
 };
 
 // ------------------------------------------------------------------ bits

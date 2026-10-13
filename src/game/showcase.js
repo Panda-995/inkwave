@@ -1805,7 +1805,7 @@ export class Showcase {
   _lobNew(p, skey) {
     const L = this.lob;
     return {
-      id: p.id, name: p.name || 'Squidkid', you: !!p.you, host: !!p.host, ready: !!p.ready, weapon: p.weapon || 'shooter',
+      id: p.id, name: p.name || '乌贼小子', you: !!p.you, host: !!p.host, ready: !!p.ready, weapon: p.weapon || 'shooter',
       style: p.style ? { ...p.style } : {}, skey, team: 0, wantTeam: 0, mark: null, at: null, dest: null, c: null, a: this._anim(), kind: null,
       phase: 'off', t0: 0, delay: 0, flag: 0, enter: null, fresh: false, path: null, s: 0, v: 0, onEnd: null, leap: null, dive: null, after: null,
       pos: new THREE.Vector3(), yaw: 0, y: 0, sy: 1, vis: 0, plateH: PLATE_H, trailS: 0, hy: 0, popAnt: 0.3, puddle: false,

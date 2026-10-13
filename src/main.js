@@ -41,7 +41,7 @@ const REFRESH_RATES = [30, 48, 50, 60, 75, 90, 100, 120, 144, 165, 240]; // comm
 // ------------------------------------------------------------------------------------------ persistence
 function loadJSON(key, def) { try { const v = JSON.parse(localStorage.getItem(key)); return v ? { ...def, ...v } : { ...def }; } catch { return { ...def }; } }
 function saveJSON(key, v) { try { localStorage.setItem(key, JSON.stringify(v)); } catch { /* private mode */ } }
-const DEFAULT_PROFILE = { name: 'Player', level: 1, xp: 0, wins: 0, matches: 0, totalTurf: 0, weapon: 'shooter' };
+const DEFAULT_PROFILE = { name: '玩家', level: 1, xp: 0, wins: 0, matches: 0, totalTurf: 0, weapon: 'shooter' };
 
 // Modules that may fall back to a stub when their file is missing. Written as literal import() calls on purpose: a
 // single `import(someVariable)` cannot be resolved by a bundler, so it survives into a bundled build and makes the
@@ -130,7 +130,7 @@ class Game {
     this.menus?.show('loading');
     this.bootMarks = [];
     const progress = async (p, label) => { this.bootMarks.push([label, Math.round(performance.now() - t0)]); this.menus?.setLoading(p, label); await nextFrame(); };
-    await progress(0.05, 'Mixing ink…');
+    await progress(0.05, '调和墨汁…');
 
     // renderer / scene
     this.R = new Renderer(app, this.settings);
@@ -222,7 +222,7 @@ class Game {
     this.CharacterClass = charMod.Character;
     try { this.PropKit = (await import('./world/props.js')).PropKit; } catch (e) { console.error('[inkwave] prop kit failed to load', e); this.PropKit = null; }
     G.audio = audioMod.audio; G.music = musicMod.music;
-    await progress(0.15, 'Building the plaza…');
+    await progress(0.15, '搭建广场…');
 
     // world
     // (old ?map=sunset links = Tidewater at dusk)
@@ -239,14 +239,14 @@ class Game {
     } catch (e) { console.error('[inkwave] texture library failed — procedural fallback', e); this.texlib = null; }
     await this._buildWorld(map);
     this.zoneMarks = new ZoneMarks(scene);   // Zone Control ground markings: build / clear themselves on 'match:state'
-    await progress(0.4, 'Filling the harbor…');
+    await progress(0.4, '注满港湾…');
     const B = G.level.bounds;
     G.env = new envMod.Environment(G.renderer, scene, { bounds: B, theme: this.theme, shadowSize: q.shadowSize, footprint: this._footprint(G.level), forceDeckField: this.touchMode });
     if (G.env.envMap) scene.environment = G.env.envMap;
     // sky-fill balance (scene.environmentIntensity, hemisphere) + per-theme exposure are the environment theme's job
     // (Environment.setTheme), so a stage/time looks the same booted into or switched to mid-session
     G.renderer.toneMappingExposure = 0.94;
-    await progress(0.55, 'Teaching squids to swim…');
+    await progress(0.55, '教乌贼游泳…');
     G.projectiles = new Projectiles(scene);
     G.subs = new SubSystem(scene);
     G.specials = new SpecialSystem(scene);
@@ -270,13 +270,13 @@ class Game {
     // online session (G.net) — the menus' online screens and startNetMatch/netMatchGo/netMatchEnd below drive it
     try { (await import('./net/session.js')).installNet(); } catch (e) { console.error('[inkwave] net', e); }
     G.net?.on?.('lobby', ({ lobby }) => this._roomPalette(lobby));
-    await progress(0.7, 'Tuning the tentacles…');
+    await progress(0.7, '理顺触手…');
 
     this._setPalette(this._pickPalette());
     this._bindEvents();
     this._startAttract();
     // warm up: compile every shader now so the first shot/splat never hitches
-    await progress(0.85, 'Warming up…');
+    await progress(0.85, '热身中…');
     this._warmup();
     // Shader compile. three.js's compileAsync calls compile() SYNCHRONOUSLY as its first statement — the extension
     // only lets the driver do the work in the background while the main thread carries on. Without
@@ -294,9 +294,9 @@ class Game {
     }
     for (const m of this._warmMeshes || []) { G.scene.remove(m); }
     this._warmMeshes?.[0]?.geometry.dispose(); this._warmMeshes = null;
-    await progress(0.93, 'Warming up…');
+    await progress(0.93, '热身中…');
     for (let i = 0; i < 3; i++) { this._frame(1 / 60); await nextFrame(); }
-    await progress(1, 'Ready!');
+    await progress(1, '准备就绪！');
     await new Promise((r) => setTimeout(r, 250));
 
     this.timer = new THREE.Timer(); this.timer.connect?.(document);
@@ -492,7 +492,7 @@ class Game {
         const p = self.profile;
         return { ...p, played: p.matches, xpToNext: PROGRESSION.xpForLevel(p.level) };
       },
-      setProfileName: (n) => { self.profile.name = String(n || 'Player').slice(0, 16); saveJSON('inkwave.profile', self.profile); },
+      setProfileName: (n) => { self.profile.name = String(n || '玩家').slice(0, 16); saveJSON('inkwave.profile', self.profile); },
       // locker look ({ hair, skin, outfit, eyes, hat, brows, … } — indices into character-style.js tables)
       setProfileStyle: (st) => { self.profile.style = { ...(st || {}) }; saveJSON('inkwave.profile', self.profile); },
       getLoadout: () => ({ weapon: self.profile.weapon || 'shooter', sub: self._subFor(self.profile.weapon), special: self._specialFor(self.profile.weapon) }),
@@ -636,28 +636,28 @@ class Game {
       if (actor.isLocal || actor._nearCamera?.()) G.audio?.play('swim_splash', { pos: actor.isLocal ? undefined : actor.pos, volume: (actor.isLocal ? 0.5 : 0.32) * Math.min(1, 0.55 + (speed || 0) / 16) });
     });
     // online, humans-only stage: a player who left is gone from the match (Match.removeActor) — say so in the feed
-    on('actor:removed', ({ actor }) => { if (this.match && !this.match.attract) this.hud?.feed({ text: `${actor.name} left the match`, color: G.teamHex[actor.team], kind: 'info' }); });
+    on('actor:removed', ({ actor }) => { if (this.match && !this.match.attract) this.hud?.feed({ text: `${actor.name} 离开了对局`, color: G.teamHex[actor.team], kind: 'info' }); });
     on('splatted', ({ victim, attacker, cause }) => {
       if (!this.match || this.match.attract) return;
       this._addDeathMark(victim);
       const local = this.match.local;
       if (attacker?.isLocal) {
         G.audio?.play('splat_enemy', { volume: 0.9 });
-        this.hud?.feed({ text: `You splatted ${victim.name}!`, color: G.teamHex[local.team], kind: 'kill' });
+        this.hud?.feed({ text: `你击倒了 ${victim.name}！`, color: G.teamHex[local.team], kind: 'kill' });
       } else if (victim.isLocal) {
         G.audio?.play('splatted_self');
         G.audio?.duck?.(0.45, 2.2);
         // the card shows what did it (hud.js splatCause): the attacker's main weapon, or the sub / special / the sea
-        const by = attacker ? attacker.name : cause === 'water' ? null : 'enemy ink';
+        const by = attacker ? attacker.name : cause === 'water' ? null : '敌方墨汁';
         this.hud?.showSplatted({ by, byColor: attacker ? G.teamHex[attacker.team] : '#6fd0ff', respawn: PLAYER.respawnTime, attacker: attacker || null, cause });
         this.rig.mode = 'spectate';
         this.rig.spectate = { actor: attacker && attacker.alive ? attacker : null, pos: victim.pos.clone(), from: victim.pos.clone() };
         this.rig.lookAt.copy(victim.pos);
       } else if (victim.team === local?.team) {
         G.audio?.play('ally_splatted', { volume: 0.5 });
-        this.hud?.feed({ text: `${victim.name} was splatted${attacker ? ' by ' + attacker.name : ''}`, color: G.teamHex[victim.enemyTeam], kind: 'death' });
+        this.hud?.feed({ text: `${victim.name} 被击倒了${attacker ? '，击倒者 ' + attacker.name : ''}`, color: G.teamHex[victim.enemyTeam], kind: 'death' });
       } else if (attacker && attacker.team === local?.team) {
-        this.hud?.feed({ text: `${attacker.name} splatted ${victim.name}`, color: G.teamHex[attacker.team], kind: 'ally' });
+        this.hud?.feed({ text: `${attacker.name} 击倒了 ${victim.name}`, color: G.teamHex[attacker.team], kind: 'ally' });
       }
     });
     on('respawn', ({ actor }) => {
@@ -672,7 +672,7 @@ class Game {
       if (actor.isLocal && !this.match?.attract) { G.audio?.play('special_ready'); }
     });
     on('special:use', ({ actor, id }) => {
-      if (actor.isLocal && !this.match?.attract) this.hud?.banner('special', SPECIALS[id].name.toUpperCase() + '!');
+      if (actor.isLocal && !this.match?.attract) this.hud?.banner('special', SPECIALS[id].name.toUpperCase() + '！');
     });
     on('shake', ({ amount, pos }) => { if (!this.match?.attract) this.rig.addShake(amount, pos); });
     on('recoil', ({ amount }) => { if (!this.match?.attract) this.rig.recoil(amount); });
@@ -821,7 +821,7 @@ class Game {
     // offline never plays an online-only stage (the menus don't offer one; a stray ?autostart / api call falls back)
     if (!mapOfflineOk(map.id) && !DEV_STAGE) {
       console.warn(`[inkwave] ${map.name} is online only — offline match on ${OFFLINE_MAPS[0].name} instead`);
-      this.menus?.toast?.(`${map.name} is online only`);
+      this.menus?.toast?.(`${map.name} 仅限联机对战`);
       map = OFFLINE_MAPS[0];
     }
     if (opts.mode === 'boss' && !mapBossOk(map.id)) opts.mode = 'turf';
@@ -839,7 +839,7 @@ class Game {
     this._setPalette(this._pickPalette());
     const m = (this.match = G.match = new Match({
       attract: false, practice, duration: opts.duration, mode: opts.mode, difficulty: opts.difficulty, weapon: this.profile.weapon || 'shooter', sub: this._subFor(this.profile.weapon), special: this._specialFor(this.profile.weapon),
-      playerName: this.profile.name || 'Player', CharacterClass: this.CharacterClass, rig: this.rig, input: this.input,
+      playerName: this.profile.name || '玩家', CharacterClass: this.CharacterClass, rig: this.rig, input: this.input,
       autopilot: params.has('autopilot'), style: this.profile.style || null, noBots: mapNoBots(map.id),   // (devstage: a solo walk)
     }));
     m.setup();
@@ -1144,8 +1144,8 @@ class Game {
       // Zone Control: less per point of turf (a 5 min match), extra for ink laid on the live zone, a knockout bonus
       const ZX = PROGRESSION.zones || { turfScale: 0.6, xpPerZoneTurfPoint: 1, xpKnockout: 300 };
       const zoneTurf = Math.round(local.stats.zoneTurf || 0);
-      xpParts = [[won ? 'WIN BONUS' : 'MATCH', won ? PROGRESSION.xpWin : PROGRESSION.xpLose], ['TURF', Math.round(turf * PROGRESSION.xpPerTurfPoint * ZX.turfScale)],
-        ['ZONE INK', Math.round(zoneTurf * ZX.xpPerZoneTurfPoint)], ['SPLATS', Math.round(local.stats.splats * PROGRESSION.xpPerSplat)], ['KNOCKOUT', won && zr.reason === 'knockout' ? ZX.xpKnockout : 0]].filter(([, v], i) => i < 2 || v > 0);
+      xpParts = [[won ? '胜利奖励' : '对局', won ? PROGRESSION.xpWin : PROGRESSION.xpLose], ['涂地', Math.round(turf * PROGRESSION.xpPerTurfPoint * ZX.turfScale)],
+        ['区域涂地', Math.round(zoneTurf * ZX.xpPerZoneTurfPoint)], ['击倒', Math.round(local.stats.splats * PROGRESSION.xpPerSplat)], ['击溃', won && zr.reason === 'knockout' ? ZX.xpKnockout : 0]].filter(([, v], i) => i < 2 || v > 0);
       gained = xpParts.reduce((a, [, v]) => a + v, 0);
     }
     const before = { level: p.level, xp: p.xp, toNext: PROGRESSION.xpForLevel(p.level) };
@@ -1543,14 +1543,14 @@ class Game {
     if (m.state === 'playing' && a.alive) {
       if (m.controller?.mapHeld) prompt = null;   // the map diorama carries its own super-jump hints
       else if (a.superJumpState) prompt = null;
-      else if (this._lowInkFlash > 0) { this._lowInkFlash -= dt; prompt = 'Low ink! Hold SHIFT in your ink to refill'; }
-      else if (a.specialReady() && (this._hints.specialT = (this._hints.specialT || 0) + dt) > 2) prompt = `Special ready! Press F`;
-      else if (inkF < 0.25 && a.form !== 'squid') prompt = 'Hold SHIFT to swim in your ink and refill';
-      else if (m.duration - m.time < 8 && !this._hints.shot) prompt = m.zones ? 'Ink the zone and hold it to count down!' : 'Paint the ground — most turf wins!';
+      else if (this._lowInkFlash > 0) { this._lowInkFlash -= dt; prompt = '墨汁不足！潜入己方墨汁按住 SHIFT 补充'; }
+      else if (a.specialReady() && (this._hints.specialT = (this._hints.specialT || 0) + dt) > 2) prompt = `特殊武器就绪！按 F 释放`;
+      else if (inkF < 0.25 && a.form !== 'squid') prompt = '按住 SHIFT 潜入己方墨汁游动补充';
+      else if (m.duration - m.time < 8 && !this._hints.shot) prompt = m.zones ? '涂满区域并占领它开始倒计时！' : '涂满地面——占地多者获胜！';
       if (!a.specialReady()) this._hints.specialT = 0;
       if (a.intent.fire) this._hints.shot = true;
     }
-    if (m.practice && m.state === 'playing' && a.alive && this._hintT < 7) prompt = 'Practice · L to change loadout · ESC for the practice menu';
+    if (m.practice && m.state === 'playing' && a.alive && this._hintT < 7) prompt = '练习模式 · L 键更换配装 · ESC 键打开练习菜单';
     const strikeAim = !!(a.specialActive && a.specialActive.id === 'strike' && a.specialActive.aiming);
     // "Yeah!" cheers → screen positions over the cheering player (anyone on screen)
     const cheers = [];
@@ -1575,7 +1575,7 @@ class Game {
       this.minimap.toCanvas(d.x, d.z, t); d.mx = t.x / this.minimap.w; d.my = t.y / this.minimap.h;
     }
     if (a.specialActive && m.state === 'playing' && a.alive) prompt = G.specials.prompt(a) || prompt;
-    else if (m.state === 'playing' && a.alive && m.actors.some((o) => o !== a && o.team === a.team && o.specialActive?.id === 'booyah' && !o.specialActive.thrown)) prompt = 'A teammate is charging a Cheer Orb — press C to cheer it on!';
+    else if (m.state === 'playing' && a.alive && m.actors.some((o) => o !== a && o.team === a.team && o.specialActive?.id === 'booyah' && !o.specialActive.thrown)) prompt = '队友正在为欢呼球充能——按 C 喝彩助威！';
     // Built once. The HUD wants [your team, theirs], and this used to get there by calling teamSummary() a second
     // time and reversing that — two filtered, mapped, allocated summaries of the same eight actors every frame just
     // to swap two entries.
@@ -1618,5 +1618,5 @@ game.boot().catch((e) => {
   try { progs = (game.R?.renderer?.info?.programs || []).map((p) => p.name || '?').join(' | ') || 'none'; } catch { /* renderer never built */ }
   window.__beacon?.('boot', `programs=[${progs}] :: ` + ((e && e.stack) || e));   // reaches the dev server's log
   const el = document.getElementById('boot-error');
-  if (el) { el.textContent = 'Something went wrong while loading: ' + e.message; el.style.display = 'block'; }
+  if (el) { el.textContent = '加载时出现问题：' + e.message; el.style.display = 'block'; }
 });

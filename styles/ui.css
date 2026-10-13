@@ -24,7 +24,7 @@
   --a: #ff8a14; --a-rgb: 255,138,20; --a-dark: #b8620f; --a-deep: #6a3a12; --a-light: #ffc48a; --a-ink: #15121c;
   --b: #2f5bff; --b-rgb: 47,91,255; --b-dark: #2442b4; --b-deep: #1d2766; --b-light: #98b0ff; --b-ink: #ffffff;
   position: absolute; inset: 0;
-  font-family: 'Rubik', system-ui, sans-serif; font-weight: 500;
+  font-family: 'Rubik', system-ui, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans SC', sans-serif; font-weight: 500;
   color: #fff; line-height: 1.2;
   -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
@@ -39,7 +39,7 @@
 
 /* chunky display type: thick outline painted under the fill */
 .iw-display {
-  font-family: 'Titan One', 'Rubik', sans-serif; font-weight: 400; letter-spacing: .015em;
+  font-family: 'Titan One', 'Rubik', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans SC', sans-serif; font-weight: 400; letter-spacing: .015em;
   -webkit-text-stroke: .17em var(--k); paint-order: stroke fill;
   text-shadow: 0 .085em 0 var(--k), 0 .16em .12em rgba(0, 0, 0, .28);
 }
@@ -311,7 +311,7 @@
 @keyframes iw-press-pulse { 0%, 100% { scale: 1; opacity: 1; } 50% { scale: 1.07; opacity: .72; } }
 .iw-title.is-go .iw-title__presstext { animation: iw-go-flash .3s steps(2) 2, iw-press-pulse 1.5s ease-in-out infinite; color: var(--a); }
 @keyframes iw-go-flash { 50% { opacity: .2; } }
-.iw-title .iw-corner--bl b { font-family: 'Titan One', sans-serif; font-weight: 400; letter-spacing: .06em; }
+.iw-title .iw-corner--bl b { font-family: 'Titan One', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans SC', sans-serif; font-weight: 400; letter-spacing: .06em; }
 
 /* ------------------------------------------------------------------ MAIN */
 .iw-main__logo { position: absolute; left: calc(var(--u) * 3.4); top: calc(var(--u) * 2.6); }

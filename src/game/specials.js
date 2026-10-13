@@ -393,17 +393,17 @@ export class SpecialSystem {
     const s = a.specialActive;
     if (!s) return null;
     switch (s.kind) {
-      case 'barrage': return `${s.def.name}! Throw ${s.bomb.name}s with RMB / E — no ink needed`;
-      case 'strike': return s.aiming ? 'Move the mouse to pick a spot · click to launch' : null;
-      case 'zooka': return 'Fire twisters with LMB';
-      case 'wail': return 'Aim the speaker · click to set it down and blast';
-      case 'kraken': return 'Kraken! LMB to jump-attack';
-      case 'blower': return `Hold LMB to blow a bubble (${s.def.max - (s.count || 0)} left) · shoot bubbles to blast them`;
-      case 'jetpack': return 'Ink Jet! Fire with LMB';
-      case 'stamp': return 'LMB to stamp · jump + LMB to slam · RMB to throw';
-      case 'booyah': return s.charge >= 1 ? 'Charged! LMB to throw' : 'Charging… teammates press C to cheer!';
-      case 'zipcaster': return s.hang > 0 ? 'Clinging — SPACE to jump off' : 'RMB / E to zip to a wall';
-      case 'crab': return s.roll ? 'Rolling (release SHIFT to stop)' : 'LMB gatling · RMB cannon · hold SHIFT to roll';
+      case 'barrage': return `${s.def.name}！用鼠标右键 / E 投掷 ${s.bomb.name}——无需墨汁`;
+      case 'strike': return s.aiming ? '移动鼠标选择落点 · 点击发射' : null;
+      case 'zooka': return '用鼠标左键发射龙卷';
+      case 'wail': return '瞄准音箱 · 点击放下并轰鸣';
+      case 'kraken': return '海妖！鼠标左键跳跃攻击';
+      case 'blower': return `按住鼠标左键吹泡泡（剩 ${s.def.max - (s.count || 0)} 个）· 射破泡泡引发爆炸`;
+      case 'jetpack': return '墨水喷射！鼠标左键开火';
+      case 'stamp': return '鼠标左键盖章 · 跳跃 + 左键重踏 · 右键投掷';
+      case 'booyah': return s.charge >= 1 ? '已蓄满！鼠标左键投掷' : '蓄力中……队友按 C 欢呼！';
+      case 'zipcaster': return s.hang > 0 ? '附着中——按空格跳离' : '右键 / E 飞索上墙';
+      case 'crab': return s.roll ? '行进中（松开 SHIFT 停止）' : '左键机枪 · 右键火炮 · 按住 SHIFT 行进';
     }
     return null;
   }

@@ -34,23 +34,23 @@ function gate() {
 
 const PAGES = [
   {
-    id: 'mp', tone: 'a', kicker: 'INTRODUCING', title: ['THE MULTIPLAYER', 'EXPANSION'], img: 'news/lobby.webp',
-    stamp: { text: 'NEW!', cls: 'is-new' },
-    lede: 'Grab your crew — the harbour just got a whole lot louder!',
+    id: 'mp', tone: 'a', kicker: '全新推出', title: ['多人对战', '扩展包'], img: 'news/lobby.webp',
+    stamp: { text: '全新！', cls: 'is-new' },
+    lede: '叫上你的伙伴——海港这下热闹多了！',
     bullets: [
-      [GLYPHS.key, 'Private rooms', 'share a code, squad up with up to 8 friends'],
-      [GLYPHS.smile, 'The Lobby', 'watch your squad roll in, emote, ready up'],
-      [GLYPHS.map, 'Cargo Terminal', 'a brand-new stage, online only', 'stages/cargo-day-sm.webp'],
+      [GLYPHS.key, '私人房间', '分享口令，最多 8 名好友组队开黑'],
+      [GLYPHS.smile, '大厅', '看队友陆续进场，发表情、准备开局'],
+      [GLYPHS.map, '货运码头', '全新场地，仅限线上', 'stages/cargo-day-sm.webp'],
     ],
   },
   {
-    id: 'boss', tone: 'b', kicker: 'INTRODUCING', title: [BOSS_NAME], img: 'news/boss.webp', fallback: () => bossSilhouette(),
-    tape: 'BOSS BATTLE · PUBLIC BETA',
-    lede: 'A giant hermit crab has moved into a rusty shipping container — and it wants the whole harbour.',
+    id: 'boss', tone: 'b', kicker: '全新推出', title: [BOSS_NAME], img: 'news/boss.webp', fallback: () => bossSilhouette(),
+    tape: '头目战 · 公开测试',
+    lede: '一只巨型寄居蟹住进了生锈的集装箱——它想要的是整座海港。',
     bullets: [
-      [GLYPHS.users, 'Co-op showdown', 'your whole squad vs one colossal crab'],
-      [GLYPHS.target, 'Three phases of chaos', 'dodge the tells, crack the shell, blast the glowing weak points'],
-      [GLYPHS.sparkle, 'Public beta', 'it’s still sharpening its claws — tell us what you think!'],
+      [GLYPHS.users, '协力对决', '全队齐心，对抗一只巨型巨蟹'],
+      [GLYPHS.target, '三段混乱战', '躲开前摇、打破外壳、猛攻发光的弱点'],
+      [GLYPHS.sparkle, '公开测试', '它还在磨爪子——欢迎告诉我们你的想法！'],
     ],
   },
 ];
@@ -103,7 +103,7 @@ export class WhatsNew {
     this.inkHost = h('div', { class: 'iw-news__inks' });
     this.card = h('div', { class: 'iw-news__card' });
     this.confetti = h('div', { class: 'iw-news__confetti' });
-    const el = this.el = h('div', { class: 'iw-news' + (this.reduced ? ' is-reduced' : ''), role: 'dialog', 'aria-modal': 'true', 'aria-label': 'What’s new' },
+    const el = this.el = h('div', { class: 'iw-news' + (this.reduced ? ' is-reduced' : ''), role: 'dialog', 'aria-modal': 'true', 'aria-label': '新内容' },
       h('div', { class: 'iw-news__dim' }), this.inkHost, this.confetti, h('div', { class: 'iw-news__stage' }, this.card));
     el._onBack = () => this.close('back');
     el.dataset.keys = '1';
@@ -154,14 +154,14 @@ export class WhatsNew {
     }));
     const btns = [];
     if (i === 0) {
-      const go = M._btn({ id: 'news-continue', label: 'CONTINUE', cls: 'iw-btn--primary iw-btn--wide iw-news__go', sound: 'ui_confirm', accept: () => this.next() });
+      const go = M._btn({ id: 'news-continue', label: '继续', cls: 'iw-btn--primary iw-btn--wide iw-news__go', sound: 'ui_confirm', accept: () => this.next() });
       go.append(h('span', { class: 'iw-news__chev', html: GLYPHS.next }));
-      const skip = M._btn({ id: 'news-skip', label: 'Skip', cls: 'iw-btn--small iw-btn--ghost iw-news__skip', sound: 'ui_back', accept: () => this.close('skip') });
+      const skip = M._btn({ id: 'news-skip', label: '跳过', cls: 'iw-btn--small iw-btn--ghost iw-news__skip', sound: 'ui_back', accept: () => this.close('skip') });
       skip.appendChild(h('span', { class: 'iw-news__skipkey' }, M._hint('Esc', 'B')));
       btns.push(go, skip);
     } else {
-      const go = M._btn({ id: 'news-try', label: 'TRY IT', icon: GLYPHS.play, cls: 'iw-btn--primary iw-btn--wide iw-news__go', sound: 'ui_confirm', accept: () => this.close('try') });
-      const later = M._btn({ id: 'news-later', label: 'LATER', cls: 'iw-btn--wide iw-btn--ghost iw-news__later', sound: 'ui_back', accept: () => this.close('later') });
+      const go = M._btn({ id: 'news-try', label: '试一试', icon: GLYPHS.play, cls: 'iw-btn--primary iw-btn--wide iw-news__go', sound: 'ui_confirm', accept: () => this.close('try') });
+      const later = M._btn({ id: 'news-later', label: '稍后', cls: 'iw-btn--wide iw-btn--ghost iw-news__later', sound: 'ui_back', accept: () => this.close('later') });
       btns.push(go, later);
     }
     btns[0].appendChild(h('span', { class: 'iw-news__key' }, M._hint('Enter', 'A')));

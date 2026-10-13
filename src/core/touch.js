@@ -25,15 +25,15 @@ const MOVE_ZONE = 0.44;
 // together. +x = left, +y = up. Tuned on device — these are the numbers to move.
 const LAYOUT = [
   { name: 'fire', label: '', x: 1.50, y: 1.50, r: 1.50, cls: 'is-fire' },
-  { name: 'jump', label: 'JUMP', x: 4.55, y: 1.20, r: 1.05 },
-  { name: 'squid', label: 'SQUID', x: 4.55, y: 3.40, r: 1.05 },
-  { name: 'sub', label: 'SUB', x: 1.50, y: 4.35, r: 1.05 },
-  { name: 'special', label: 'SP', x: 4.20, y: 5.30, r: 1.05 },
+  { name: 'jump', label: '跳', x: 4.55, y: 1.20, r: 1.05 },
+  { name: 'squid', label: '乌贼', x: 4.55, y: 3.40, r: 1.05 },
+  { name: 'sub', label: '副', x: 1.50, y: 4.35, r: 1.05 },
+  { name: 'special', label: '特', x: 4.20, y: 5.30, r: 1.05 },
 ];
 // Top-right row: not thumb-arc controls, so they sit on their own line. `top: true` anchors them to the top edge.
 const TOP_LAYOUT = [
-  { name: 'map', label: 'MAP', x: 1.10, y: 1.10, r: 0.90, cls: 'is-small', top: true },
-  { name: 'cheer', label: 'YEAH', x: 2.95, y: 1.10, r: 0.90, cls: 'is-small', top: true },
+  { name: 'map', label: '地图', x: 1.10, y: 1.10, r: 0.90, cls: 'is-small', top: true },
+  { name: 'cheer', label: '好耶', x: 2.95, y: 1.10, r: 0.90, cls: 'is-small', top: true },
   { name: 'pause', label: 'II', x: 4.80, y: 1.10, r: 0.90, cls: 'is-small', top: true },
 ];
 
@@ -95,7 +95,7 @@ export class TouchControls {
     // child can never paint over the menus — and the portrait menu is exactly what the gate exists to replace.
     const rotate = document.createElement('div');
     rotate.className = 'iw-touch-rotate';
-    rotate.innerHTML = '<div><i>▭</i><b>Turn your device</b><span>INKWAVE is played in landscape.</span></div>';
+    rotate.innerHTML = '<div><i>▭</i><b>请横置设备</b><span>INKWAVE 需在横屏下游玩。</span></div>';
     parent.appendChild(rotate);
     this.rotateEl = rotate;
 

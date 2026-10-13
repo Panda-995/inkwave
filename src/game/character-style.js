@@ -21,7 +21,7 @@ export const SKIN_TONES = [
   '#8f5a3a', // 7 chestnut, warm red undertone
   '#4a2c20', // 8 ebony, deep cool undertone
 ];
-export const SKIN_NAMES = ['Rosy', 'Peach', 'Tan', 'Cocoa', 'Porcelain', 'Honey', 'Olive', 'Chestnut', 'Ebony'];
+export const SKIN_NAMES = ['樱粉', '蜜桃', '小麦', '可可', '瓷白', '蜜色', '橄榄', '栗棕', '乌木'];
 
 // ---- outfits: tee cut, graphic language (pattern → cloth shader), coordinated colourway. Base colours stay in the
 // neutral / earth family so every team ink (orange, cobalt, pink, mint, lemon, grape, aqua, cherry, lime, magenta)
@@ -38,7 +38,7 @@ export const OUTFITS = [
   { shirt: '#f2f2ef', shorts: '#23262d', shoe: '#23262d', sole: '#f2f1ec', sock: '#f7f7f4', strap: '#23262d', pattern: 8 },
   { shirt: '#1f2a44', shorts: '#1f2a44', shoe: '#f2f1ec', sole: '#1f2a44', sock: '#f7f7f4', strap: '#161b29', pattern: 9 },
 ];
-export const OUTFIT_NAMES = ['Basic Ringer', 'Night Pinstripe', 'Raglan Runner', 'Chevron Tee', 'Breton Stripe', 'Splatter Tee', 'Splat Camo', 'Dip-Dye Tee', 'Pro Jersey', 'Track Top'];
+export const OUTFIT_NAMES = ['基础镶边T', '夜色细条纹', '插肩跑者', '斜纹T恤', '布列塔尼条纹', '泼墨T恤', '墨汁迷彩', '渐染T恤', '职业球衣', '田径外套'];
 
 // ---- eyes: iris gradient [top, bottom] ---------------------------------------------------------------------------
 export const IRIS = [
@@ -51,34 +51,34 @@ export const IRIS = [
   ['#e4f4ff', '#4f7fc4'], // 6 frost
   ['#ff8f6b', '#b3121c'], // 7 ember
 ];
-export const IRIS_NAMES = ['Amber', 'Lagoon', 'Violet', 'Lime', 'Rose', 'Hazel', 'Frost', 'Ember'];
+export const IRIS_NAMES = ['琥珀', '潟湖', '紫罗兰', '青柠', '玫瑰', '榛子', '霜蓝', '余烬'];
 
 // ---- hair: built by character-geo.js (STYLES, same order). Tentacle hair always takes the team ink colour. ----------
-export const HAIR_STYLE_NAMES = ['Tide', 'Spike', 'Twin', 'Bob', 'Pony', 'Crest', 'Knot', 'Swoop'];
+export const HAIR_STYLE_NAMES = ['浪头', '尖刺', '双马尾', '波波头', '马尾', '鸡冠', '发髻', '斜刘海'];
 export const HAIR_STYLES = HAIR_STYLE_NAMES.length;
 
 // ---- headgear (optional, `hat`): built into the hair mesh by character-geo.js (HAT_KINDS, same order). Every style's
 // tentacles are re-rooted under the rim so nothing clips; styles whose shape sits on top switch to a hat variant
 // (low ponytail, low bun, lower twin ties, back flicks). 0 = none.
 export const HATS = ['none', 'cap', 'beanie', 'bucket'];
-export const HAT_NAMES = ['None', 'Snapback', 'Beanie', 'Bucket Hat'];
+export const HAT_NAMES = ['无', '平沿帽', '毛线帽', '渔夫帽'];
 
 // ---- brows (optional, `brows`): shape of the painted-ink brow strokes. 0 = classic.
 export const BROWS = ['classic', 'bold', 'arched', 'straight'];
-export const BROW_NAMES = ['Classic', 'Bold', 'Arched', 'Straight'];
+export const BROW_NAMES = ['经典', '浓眉', '弓形', '平直'];
 
 // ---- named full looks ("characters") the locker can offer one-click -----------------------------------------------
 export const PRESETS = [
-  { id: 'rookie', name: 'Rookie', blurb: 'Fresh off the ferry, ringer tee and long tentacles.', style: { hair: 0, skin: 0, outfit: 0, eyes: 0, hat: 0, brows: 0 } },
-  { id: 'dash', name: 'Dash', blurb: 'Track-top sprinter with a spiky quiff.', style: { hair: 1, skin: 5, outfit: 9, eyes: 1, hat: 0, brows: 1 } },
-  { id: 'pip', name: 'Pip', blurb: 'Twin tails, breton stripes, always first to the ferry deck.', style: { hair: 2, skin: 4, outfit: 4, eyes: 4, hat: 0, brows: 2 } },
-  { id: 'coral', name: 'Coral', blurb: 'Dip-dyed and unbothered.', style: { hair: 3, skin: 3, outfit: 7, eyes: 5, hat: 0, brows: 0 } },
-  { id: 'marlo', name: 'Marlo', blurb: 'Ponytail up, jersey on, game face.', style: { hair: 4, skin: 1, outfit: 8, eyes: 7, hat: 0, brows: 1 } },
-  { id: 'riptide', name: 'Riptide', blurb: 'Mohawk crest and a splatter tee. Loud.', style: { hair: 5, skin: 7, outfit: 5, eyes: 3, hat: 0, brows: 3 } },
-  { id: 'nori', name: 'Nori', blurb: 'Low bun under a bucket hat, splat camo, very patient charger main.', style: { hair: 6, skin: 6, outfit: 6, eyes: 2, hat: 3, brows: 3 } },
-  { id: 'suki', name: 'Suki', blurb: 'Side-swept and too cool for the lobby.', style: { hair: 7, skin: 8, outfit: 1, eyes: 6, hat: 0, brows: 2 } },
-  { id: 'kelp', name: 'Kelp', blurb: 'Beanie season, all season.', style: { hair: 3, skin: 2, outfit: 2, eyes: 3, hat: 2, brows: 0 } },
-  { id: 'skipper', name: 'Skipper', blurb: 'Snapback, raglan, harbour regular.', style: { hair: 0, skin: 5, outfit: 3, eyes: 0, hat: 1, brows: 1 } },
+  { id: 'rookie', name: '菜鸟', blurb: '刚下渡轮的新人，镶边T恤配长触手。', style: { hair: 0, skin: 0, outfit: 0, eyes: 0, hat: 0, brows: 0 } },
+  { id: 'dash', name: '疾风', blurb: '田径外套短跑健将，刺猬头向上翘。', style: { hair: 1, skin: 5, outfit: 9, eyes: 1, hat: 0, brows: 1 } },
+  { id: 'pip', name: '小 Pip', blurb: '双马尾配条纹衫，总第一个冲上渡轮甲板。', style: { hair: 2, skin: 4, outfit: 4, eyes: 4, hat: 0, brows: 2 } },
+  { id: 'coral', name: '珊瑚', blurb: '发尾渐染，一脸淡定。', style: { hair: 3, skin: 3, outfit: 7, eyes: 5, hat: 0, brows: 0 } },
+  { id: 'marlo', name: '马洛', blurb: '高马尾、球衣上身，写满求胜欲。', style: { hair: 4, skin: 1, outfit: 8, eyes: 7, hat: 0, brows: 1 } },
+  { id: 'riptide', name: '激浪', blurb: '鸡冠头配泼墨T，怎么张扬怎么来。', style: { hair: 5, skin: 7, outfit: 5, eyes: 3, hat: 0, brows: 3 } },
+  { id: 'nori', name: '海苔', blurb: '渔夫帽下挽个低发髻，一身墨汁迷彩，狙击枪老手极有耐心。', style: { hair: 6, skin: 6, outfit: 6, eyes: 2, hat: 3, brows: 3 } },
+  { id: 'suki', name: '穗子', blurb: '斜刘海，酷得都不想进大厅。', style: { hair: 7, skin: 8, outfit: 1, eyes: 6, hat: 0, brows: 2 } },
+  { id: 'kelp', name: '海带', blurb: '一年四季都是毛线帽季。', style: { hair: 3, skin: 2, outfit: 2, eyes: 3, hat: 2, brows: 0 } },
+  { id: 'skipper', name: '船长', blurb: '平沿帽加插肩袖，码头常客。', style: { hair: 0, skin: 5, outfit: 3, eyes: 0, hat: 1, brows: 1 } },
 ];
 
 const wrap = (v, n) => ((Math.round(v) % n) + n) % n;

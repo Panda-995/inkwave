@@ -1,19 +1,19 @@
 // Shared tuning + content definitions. Every module reads from here; nothing here imports anything.
 
 export const GAME_TITLE = 'INKWAVE';
-export const GAME_SUBTITLE = 'Turf Riot';
+export const GAME_SUBTITLE = '占地大乱斗';
 export const VERSION = '1.0.0';
 
 // Team ink palettes. Team 0 ("Alpha") is always the local player's team; a palette is picked per match.
 export const TEAM_PALETTES = [
-  { id: 'tangerine-cobalt', a: '#ff8a14', b: '#2f5bff', names: ['Tangerine', 'Cobalt'] },
-  { id: 'bubblegum-mint', a: '#ff3f9e', b: '#18d48c', names: ['Bubblegum', 'Mint'] },
-  { id: 'lemon-grape', a: '#f2e312', b: '#8a3cff', names: ['Lemon', 'Grape'] },
-  { id: 'aqua-cherry', a: '#10d2e6', b: '#ff4150', names: ['Aqua', 'Cherry'] },
-  { id: 'lime-magenta', a: '#a6f01a', b: '#e02cd8', names: ['Lime', 'Magenta'] },
+  { id: 'tangerine-cobalt', a: '#ff8a14', b: '#2f5bff', names: ['橘子', '钴蓝'] },
+  { id: 'bubblegum-mint', a: '#ff3f9e', b: '#18d48c', names: ['泡泡糖', '薄荷'] },
+  { id: 'lemon-grape', a: '#f2e312', b: '#8a3cff', names: ['柠檬', '葡萄'] },
+  { id: 'aqua-cherry', a: '#10d2e6', b: '#ff4150', names: ['水蓝', '樱桃'] },
+  { id: 'lime-magenta', a: '#a6f01a', b: '#e02cd8', names: ['青柠', '洋红'] },
 ];
 // Used instead when settings.colorblind is on (yellow vs blue is safe for all common CVD types).
-export const COLORBLIND_PALETTE = { id: 'cb-yellow-blue', a: '#ffd21a', b: '#2a52ff', names: ['Sun', 'Sea'] };
+export const COLORBLIND_PALETTE = { id: 'cb-yellow-blue', a: '#ffd21a', b: '#2a52ff', names: ['骄阳', '碧海'] };
 
 export const TEAM_NAMES = ['Alpha', 'Bravo'];
 
@@ -93,8 +93,8 @@ export const PLAYER = {
 // stats.* are 0..1 display bars for the loadout screen.
 export const WEAPONS = {
   shooter: {
-    id: 'shooter', name: 'Spritzer', kind: 'shooter', class: 'Shooter',
-    blurb: 'Rapid-fire all-rounder. Sprays a steady stream of ink blobs.',
+    id: 'shooter', name: '细雾枪', kind: 'shooter', class: '射击枪',
+    blurb: '速射全能型。持续喷出稳定的墨汁弹流。',
     stats: { range: 0.5, damage: 0.45, rate: 0.85, mobility: 0.7, paint: 0.6 },
     fireInterval: 0.1, damage: 36, inkPerShot: 0.95,
     projSpeed: 34, straightTime: 0.13, range: 12.5,
@@ -104,8 +104,8 @@ export const WEAPONS = {
     special: 'zooka', specialCost: 190, sub: 'bomb',
   },
   roller: {
-    id: 'roller', name: 'Swell Roller', kind: 'roller', class: 'Roller',
-    blurb: 'Roll out wide stripes of turf. Flick for a crushing splash.',
+    id: 'roller', name: '涌浪滚筒', kind: 'roller', class: '滚筒',
+    blurb: '滚出宽阔的涂地带。挥击可砸出致命的墨花。',
     stats: { range: 0.35, damage: 0.95, rate: 0.3, mobility: 0.55, paint: 0.95 },
     rollSpeed: 4.4, rollWidth: 1.9, rollInkPerMeter: 1.1, rollDamage: 140,
     flickInterval: 0.62, flickWindup: 0.22, flickInk: 9, flickDrops: 9,
@@ -115,8 +115,8 @@ export const WEAPONS = {
     special: 'kraken', specialCost: 170, sub: 'sticky',
   },
   charger: {
-    id: 'charger', name: 'Glint Charger', kind: 'charger', class: 'Charger',
-    blurb: 'Hold to charge, release for a long piercing line. Full charge splats.',
+    id: 'charger', name: '微光蓄力枪', kind: 'charger', class: '蓄力枪',
+    blurb: '按住蓄力，松开射出贯穿长线。满蓄力一击击倒。',
     stats: { range: 1.0, damage: 1.0, rate: 0.25, mobility: 0.35, paint: 0.45 },
     chargeTime: 1.0, rangeMin: 11, rangeMax: 27, damageMin: 40, damageMax: 160,
     inkFull: 18, lineSplatEvery: 1.2, lineRadius: 0.55, impactRadius: 1.2,
@@ -124,8 +124,8 @@ export const WEAPONS = {
     special: 'sonar', specialCost: 180, sub: 'mine',
   },
   blaster: {
-    id: 'blaster', name: 'Popper Blaster', kind: 'blaster', class: 'Blaster',
-    blurb: 'Slow shots that burst mid-air. Direct hits splat instantly.',
+    id: 'blaster', name: '砰砰爆破枪', kind: 'blaster', class: '爆破枪',
+    blurb: '弹速较慢、在空中炸开。直接命中可瞬间击倒。',
     stats: { range: 0.55, damage: 0.9, rate: 0.3, mobility: 0.6, paint: 0.5 },
     fireInterval: 0.78, directDamage: 125, splashDamageMax: 70, splashDamageMin: 30,
     splashRadius: 2.6, inkPerShot: 9, projSpeed: 23, range: 10.5,
@@ -135,8 +135,8 @@ export const WEAPONS = {
   },
   // `anim` = the pose family the character animates with (kind otherwise)
   bucket: {
-    id: 'bucket', name: 'Bilge Bucket', kind: 'bucket', class: 'Bucket', anim: 'blaster',
-    blurb: 'Hurl a wave of ink in an arc: aim higher to throw farther, lob it over cover. Full damage at any distance; two hits splat.',
+    id: 'bucket', name: '舱底水桶', kind: 'bucket', class: '泼桶', anim: 'blaster',
+    blurb: '沿弧线泼出一大波墨汁：抬得越高泼得越远，可以越过掩体。任何距离都是全额伤害；两发击倒。',
     stats: { range: 0.5, damage: 0.8, rate: 0.35, mobility: 0.6, paint: 0.7 },
     fireInterval: 0.6, windup: 0.12, inkPerShot: 6,
     throwSpeed: 15.5, lob: 0.3, blobs: 5, gravity: 20, drag: 0.25, reach: 9.5,
@@ -146,8 +146,8 @@ export const WEAPONS = {
     special: 'blower', specialCost: 180, sub: 'sprinkler',
   },
   spinner: {
-    id: 'spinner', name: 'Squall Spinner', kind: 'spinner', class: 'Spinner', anim: 'charger',
-    blurb: 'Spin up, then unleash a stream of ink. A full spin reaches farthest and fires longest.',
+    id: 'spinner', name: '狂风旋转枪', kind: 'spinner', class: '旋转枪', anim: 'charger',
+    blurb: '先旋转蓄力，再倾泻墨汁流。完全旋转后射程最远、射击时间最长。',
     stats: { range: 0.88, damage: 0.55, rate: 1.0, mobility: 0.4, paint: 0.7 },
     chargeTime: 1.0, inkFull: 24, burstMin: 0.35, burstMax: 1.8, fireInterval: 0.05,
     damage: 26, speedMin: 25, speedMax: 40, straightMin: 0.09, straightMax: 0.24, rangeMin: 10, rangeMax: 21,
@@ -156,8 +156,8 @@ export const WEAPONS = {
     special: 'crab', specialCost: 200, sub: 'curtain',
   },
   twins: {
-    id: 'twins', name: 'Twinfire Pistols', kind: 'twins', class: 'Pistols', anim: 'shooter',
-    blurb: 'Paired pistols. Jump while firing to dodge-roll; stand still after a roll for rapid, longer-range fire. Walking returns to dual mode.',
+    id: 'twins', name: '双焰手枪', kind: 'twins', class: '双枪', anim: 'shooter',
+    blurb: '成对手枪。射击时按跳跃可翻滚闪避；翻滚后站定不动，可高速远距连射。一旦移动就恢复双持模式。',
     stats: { range: 0.4, damage: 0.4, rate: 0.95, mobility: 0.9, paint: 0.55 },
     fireInterval: 0.085, damage: 30, inkPerShot: 0.85, projSpeed: 31, straightTime: 0.11, range: 11,
     spreadGround: 6, spreadAir: 11, impactRadius: 0.78, trailRadius: 0.4, trailEvery: 1.1,
@@ -167,8 +167,8 @@ export const WEAPONS = {
     special: 'bubbler', specialCost: 180, sub: 'seeker',
   },
   brush: {
-    id: 'brush', name: 'Swish Brush', kind: 'brush', class: 'Brush', anim: 'roller',
-    blurb: 'Dash along the ground leaving a thin trail, or swipe side to side to flick a spray of small globs.',
+    id: 'brush', name: '刷刷笔刷', kind: 'brush', class: '笔刷', anim: 'roller',
+    blurb: '贴地疾行留下一道细窄墨痕，或左右挥动甩出一片细小墨滴。',
     stats: { range: 0.2, damage: 0.35, rate: 1.0, mobility: 1.0, paint: 0.5 },
     brushSpeed: 7.4, brushWidth: 0.95, brushInkPerMeter: 0.32, brushDamage: 30, brushHitCd: 0.35,
     swipeInterval: 0.16, swipeInk: 2.2, swipeDrops: 5, swipeSpeed: 12.5, swipeSpreadDeg: 40,
@@ -178,8 +178,8 @@ export const WEAPONS = {
   },
   // ---- kit weapons: each kind lives in src/game/kits/<kind>.js (registered in kits/registry.js); the numbers here are its tuning
   brolly: {
-    id: 'brolly', name: 'Canopy Brolly', kind: 'brolly', class: 'Brolly', anim: 'shooter',
-    blurb: 'A shotgun spray of ink pellets. Hold to open the canopy: a shield for you and your team. Keep holding to launch it as a rolling wall.',
+    id: 'brolly', name: '华盖伞', kind: 'brolly', class: '伞', anim: 'shooter',
+    blurb: '霰射一片墨珠。按住可撑开伞面：为你和队友充当护盾。继续按住可将伞面发射出去，化作一面滚动的墨墙。',
     stats: { range: 0.35, damage: 0.7, rate: 0.5, mobility: 0.6, paint: 0.55 },
     range: 7,
     // pellets: a narrow cone of `pellets` per shot; each does pelletDamage out to falloffStart (m), easing to
@@ -197,8 +197,8 @@ export const WEAPONS = {
     special: 'bubbler', specialCost: 180, sub: 'tracer',
   },
   bow: {
-    id: 'bow', name: 'Tideline Bow', kind: 'bow', class: 'Bow', anim: 'charger',
-    blurb: 'Draw to fill two rings, then loose three arrows at once: a flat fan on the ground, an upright one in the air. Past the first ring the arrows stick where they land and burst.',
+    id: 'bow', name: '潮线弓', kind: 'bow', class: '弓', anim: 'charger',
+    blurb: '拉弓蓄满两道环，然后同时放出三支箭：贴地展开的扇形，以及立在空中的一支。蓄力超过第一道环后，箭会钉在落点并爆炸。',
     stats: { range: 0.85, damage: 0.6, rate: 0.45, mobility: 0.5, paint: 0.6 },
     // (kits/bow.js) draw time to full; ring 1 is this share of it. Charge < ring1 = a tap: short, weak, no lodge
     chargeTime: 1.0, ring1: 0.45,
@@ -218,8 +218,8 @@ export const WEAPONS = {
     special: 'strike', specialCost: 190, sub: 'waddle',
   },
   blade: {
-    id: 'blade', name: 'Brine Cutlass', kind: 'blade', class: 'Cutlass', anim: 'blade',
-    blurb: 'Tap for quick slashes that fling a crescent of ink. Hold to charge an overhead cut that sends a long ink wave. The blade itself hits hard: a charged cut splats in one hit.',
+    id: 'blade', name: '盐雾弯刀', kind: 'blade', class: '弯刀', anim: 'blade',
+    blurb: '轻点挥出快速斩击，甩出一弯墨刃。按住蓄力使出头顶重斩，放出一道长长的墨浪。刀刃本身伤害极高：蓄力斩一击即可击倒。',
     stats: { range: 0.35, damage: 0.85, rate: 0.75, mobility: 0.85, paint: 0.55 },
     // (kits/blade.js; pose family HOLD.blade in character.js) range = the quick cut's droplet reach (aim assist, bots)
     range: 6.5, projSpeed: 17,
@@ -237,8 +237,8 @@ export const WEAPONS = {
     special: 'zipcaster', specialCost: 180, sub: 'shaker',
   },
   mitts: {
-    id: 'mitts', name: 'Sponge Mitts', kind: 'mitts', class: 'Mitts', anim: 'shooter',
-    blurb: 'Punch out ink fists that burst a few metres ahead — with your gloves up, the sponge soaks part of any hit from the front. Hold fire and press jump to charge a long leap that splashes where you land, and sticks you to walls (holding on drains ink).',
+    id: 'mitts', name: '海绵拳套', kind: 'mitts', class: '拳套', anim: 'shooter',
+    blurb: '打出会在前方数米爆开的墨汁拳——举拳迎敌时，海绵能吸收来自正面的部分伤害。按住射击并按跳跃可蓄力飞跃一大段，落地时溅开墨汁，还能吸附在墙上（持续抓墙会消耗墨汁）。',
     stats: { range: 0.3, damage: 0.75, rate: 0.9, mobility: 0.9, paint: 0.5 },
     range: 5.3,              // reach for bots / aim assist: the fist's flight + its burst
     // punches: alternating gloves; each throws an ink fist that flies fistRange and bursts (or bursts on what it hits)
@@ -264,8 +264,8 @@ export const WEAPONS = {
   },
   // ---- upstream's arsenal (retired from the roster — see WEAPON_ORDER; dualies ≈ twins, slosher ≈ bucket, splatling ≈ spinner)
   dualies: {
-    id: 'dualies', name: 'Twinfin Dualies', kind: 'dualies', class: 'Dualies', sub: 'bomb',
-    blurb: 'Twin pistols, alternating fire. Jump while firing to dodge-roll, then plant and unload.',
+    id: 'dualies', name: '双鳍双枪', kind: 'dualies', class: '翻滚双枪', sub: 'bomb',
+    blurb: '成对手枪轮流开火。射击时按跳跃翻滚闪避，随后站定倾泻火力。',
     stats: { range: 0.42, damage: 0.4, rate: 0.95, mobility: 0.95, paint: 0.55 },
     fireInterval: 0.083, damage: 30, inkPerShot: 0.85,        // hands alternate: 12 shots/s, 4 hits to splat
     projSpeed: 32, straightTime: 0.11, range: 11,
@@ -276,8 +276,8 @@ export const WEAPONS = {
     special: 'slam', specialCost: 180,
   },
   slosher: {
-    id: 'slosher', name: 'Tidebucket Slosher', kind: 'slosher', class: 'Slosher', sub: 'bomb',
-    blurb: 'Heaves a heavy wave of ink in an arc: over cover, up ledges, a thick stripe where it lands.',
+    id: 'slosher', name: '潮桶泼筒', kind: 'slosher', class: '泼筒', sub: 'bomb',
+    blurb: '沿弧线泼出一大波沉重的墨汁：越过掩体、抛上高台，在落点留下厚厚一条墨带。',
     stats: { range: 0.58, damage: 0.8, rate: 0.4, mobility: 0.6, paint: 0.78 },
     fireInterval: 0.62, windup: 0.13, inkPerShot: 7.5,
     projSpeed: 15, grav: 22, range: 9.5, drops: 8,
@@ -287,8 +287,8 @@ export const WEAPONS = {
     special: 'slam', specialCost: 175,
   },
   splatling: {
-    id: 'splatling', name: 'Gyre Splatling', kind: 'splatling', class: 'Splatling', sub: 'bomb',
-    blurb: 'Hold to spin up, release for a long high-speed stream. The more charge, the longer it lasts.',
+    id: 'splatling', name: '漩涡蓄能枪', kind: 'splatling', class: '蓄能枪', sub: 'bomb',
+    blurb: '按住旋转蓄力，松开倾泻高速墨汁流。蓄力越满，持续越久。',
     stats: { range: 0.78, damage: 0.55, rate: 1.0, mobility: 0.38, paint: 0.7 },
     chargeTime: 0.85, burstMin: 0.3, burstMax: 1.7, fireInterval: 0.066, damage: 28, inkPerShot: 0.6,
     projSpeed: 40, straightTime: 0.16, range: 15,
@@ -317,19 +317,19 @@ export function weaponRange(w) {
 // Sub weapons. Each weapon has a default (`sub` on the weapon); the loadout can swap it for any of these.
 export const SUBS = {
   bomb: {
-    id: 'bomb', name: 'Splat Bomb', kind: 'bomb', blurb: 'Bounces, arms when it lands, then bursts. Splats anyone close.',
+    id: 'bomb', name: '墨汁炸弹', kind: 'bomb', blurb: '弹跳落地后进入待发状态，随后爆炸。击倒附近的所有人。',
     inkCost: 70, throwSpeed: 13.5, fuse: 0.95, radius: 3.1, damageMax: 180, damageMin: 35, paintRadius: 2.7,
   },
   sticky: {
-    id: 'sticky', name: 'Cling Charge', kind: 'sticky', blurb: 'Sticks to whatever it hits (floors, walls, ceilings) and blows after a moment with a wide blast.',
+    id: 'sticky', name: '黏着炸药', kind: 'sticky', blurb: '粘住所碰到的一切（地面、墙壁、天花板），稍后以大范围爆炸引爆。',
     inkCost: 70, throwSpeed: 13.5, fuse: 2.4, radius: 4.0, damageMax: 180, damageMin: 35, paintRadius: 3.3,
   },
   burst: {
-    id: 'burst', name: 'Pop Pellet', kind: 'burst', blurb: 'Pops on impact. Cheap enough to throw twice: two direct hits or three near misses splat.',
+    id: 'burst', name: '爆裂弹', kind: 'burst', blurb: '触物即爆。消耗低到可以连扔两颗：两发直击或三次近失即可击倒。',
     inkCost: 40, throwSpeed: 16, radius: 2.1, directDamage: 60, splashDamage: 35, paintRadius: 1.8,
   },
   seeker: {
-    id: 'seeker', name: 'Skitter Bomb', kind: 'seeker', blurb: 'Scuttles after the nearest foe, laying a swimmable ink trail, and bursts when it reaches them. It turns wide: sidestep it late.',
+    id: 'seeker', name: '疾走炸弹', kind: 'seeker', blurb: '疾走追击最近的敌人，沿途留下可供游动的墨迹，追上后爆炸。它转弯半径很大：贴近时再侧身闪避。',
     // turnRate: rad/s (1.75 ≈ 100°/s: a ~3.6 m turning circle at full speed; was 5); commitDist: dashes straight (no
     // steering) once this close and lined up; creep: how much it slows turning onto a slow / standing target.
     // speed 6.3 (was 7): only just faster than a run (6), so a foe who sidesteps and keeps running gets away instead
@@ -338,32 +338,32 @@ export const SUBS = {
     radius: 2.8, damageMax: 180, damageMin: 35, paintRadius: 2.4,
   },
   scan: {
-    id: 'scan', name: 'Echo Orb', kind: 'scan', blurb: 'Bursts into a sensing cloud. Foes it touches are tracked for your whole team. No damage.',
+    id: 'scan', name: '回声球', kind: 'scan', blurb: '爆开成一片感应云。被触碰到的敌人会为全队持续标记。无伤害。',
     inkCost: 55, throwSpeed: 14, fuse: 1.1, radius: 4.2, cloudTime: 0.9, trackTime: 8,
   },
   curtain: {
-    id: 'curtain', name: 'Drip Curtain', kind: 'curtain', blurb: 'Drops a wall of falling ink that stops enemy players and shots. It fades over time, faster when shot.',
+    id: 'curtain', name: '墨水帘幕', kind: 'curtain', blurb: '放下一面墨水帘，阻挡敌方玩家与子弹。会随时间消散，被射击时消散得更快。',
     inkCost: 55, throwSpeed: 9, width: 3.4, height: 2.7, hp: 170, decay: 19, shotMul: 0.5,
   },
   sprinkler: {
-    id: 'sprinkler', name: 'Twirl Sprinkler', kind: 'sprinkler', blurb: 'Sticks to any surface and sprays ink around it in pulses, until it is shot or you get splatted.',
+    id: 'sprinkler', name: '旋转洒墨器', kind: 'sprinkler', blurb: '粘附于任意表面，一波一波向外喷洒墨汁，直到被击毁或你被击倒。',
     inkCost: 60, throwSpeed: 12, hp: 70, pulse: 0.3, drops: 6, sprayRadius: 3.2, sprayFade: 12, dropDamage: 8,
   },
   mine: {
-    id: 'mine', name: 'Lurk Mine', kind: 'mine', blurb: 'Planted at your feet and hidden in your ink. Foes who come close are hit and tracked. Two at a time.',
+    id: 'mine', name: '潜伏地雷', kind: 'mine', blurb: '埋设在你脚下，隐藏于己方墨汁中。靠近的敌人会受到伤害并被标记。最多同时放置两枚。',
     inkCost: 55, placed: true, max: 2, triggerRadius: 2.1, armTime: 0.9, delay: 0.35, radius: 2.6, damage: 45, trackTime: 8, paintRadius: 2.0,
   },
   beacon: {
-    id: 'beacon', name: 'Hop Beacon', kind: 'beacon', blurb: 'A super-jump point for your team. Place up to three; each takes two jumps.',
+    id: 'beacon', name: '跳跃信标', kind: 'beacon', blurb: '供全队使用的超级跳跃点。最多放置三个；每个可用两次。',
     inkCost: 70, placed: true, max: 3, uses: 2, hp: 50,
   },
   mist: {
-    id: 'mist', name: 'Murk Bomb', kind: 'mist', blurb: 'Releases a poison mist that slows foes and drains their ink. A direct hit keeps them poisoned until the mist fades.',
+    id: 'mist', name: '毒雾弹', kind: 'mist', blurb: '释放毒雾，减缓敌人速度并消耗其墨汁。被直接命中的敌人会持续中毒，直到毒雾散去。',
     inkCost: 60, throwSpeed: 13.5, fuse: 1.0, radius: 3.3, mistTime: 4.5, slow: 0.55, inkDrain: 12,
   },
   // ---- kit subs: each kind lives in src/game/kits/<kind>.js
   shaker: {
-    id: 'shaker', name: 'Shaker Bomb', kind: 'shaker', blurb: 'Hold to shake it up (mash jump, keep moving): up to three blasts that hop it forward.',
+    id: 'shaker', name: '摇爆炸弹', kind: 'shaker', blurb: '按住把它摇起来（连打跳跃、保持移动）：最多三次爆炸，每次都把它向前弹一段。',
     inkCost: 60, throwSpeed: 13,
     // charge (0..1; 2 blasts at ½, 3 at full): plain holding fills it in chargeTime; running adds up to moveBoost × that
     // rate; each jump press adds jumpBoost, each stick / mouse waggle shakeBoost; never faster than maxRate per second
@@ -373,14 +373,14 @@ export const SUBS = {
     trailEvery: 0.38, trailRadius: 0.3,                       // thin ink trail sprayed while it travels
   },
   waddle: {
-    id: 'waddle', name: 'Waddle Bomb', kind: 'waddle', blurb: 'Waddles after foes it senses near where it lands, noisily. Blows up where it lands if nobody is near.',
+    id: 'waddle', name: '摇摆炸弹', kind: 'waddle', blurb: '摇摇摆摆地追击落点附近感知到的敌人，动静很大。若附近无人，就在原地爆炸。',
     inkCost: 65, throwSpeed: 12,
     senseRadius: 7.5, senseUp: 4, fuse: 1.1,                  // sensing circle on landing; nobody inside → blows after fuse
     speed: 4.0, turnRate: 8, life: 9, maxTravel: 26, triggerDist: 1.2,   // tracks its foe (nav paths, hops up steps)
     radius: 3.0, damageMax: 180, damageMin: 35, paintRadius: 2.6, hp: 30,  // Splat Bomb blast; shoot-able (30 hp)
   },
   torpedo: {
-    id: 'torpedo', name: 'Tide Torpedo', kind: 'torpedo', blurb: 'Locks onto a foe in mid-air, then darts at them and bursts into droplets. One out at a time.',
+    id: 'torpedo', name: '潮汐鱼雷', kind: 'torpedo', blurb: '在空中锁定敌人，随后急速冲向目标并炸成一片墨滴。同时只能存在一枚。',
     inkCost: 65, throwSpeed: 13.5, feetPaint: 1.25,
     // flight → lock (a foe within lockRange, in sight, after armTime) → unfold (hovers) → launch (swims at them, homing)
     armTime: 0.12, lockRange: 6.5, flyLife: 2.5, unfoldTime: 0.5, launchSpeed0: 2.2, launchSpeed: 9.5, launchAccel: 8, turnRate: 1.9, launchLife: 2.8,
@@ -390,12 +390,12 @@ export const SUBS = {
     drops: 10, dropDamage: 12, dropHits: 3, dropPaint: 0.65,        // locked burst only: 60 + 3 × 12 = 96 max
   },
   tracer: {
-    id: 'tracer', name: 'Tracer Bolt', kind: 'tracer', blurb: 'A fast bolt fired a little low that skims and ricochets, puddling ink on every bounce. Hits and its trail mark foes for your team.',
+    id: 'tracer', name: '曳光弹', kind: 'tracer', blurb: '略微压低射出的快速弹丸，贴地弹跳，每次弹跳都留下一滩墨汁。命中与弹痕都会为全队标记敌人。',
     inkCost: 40, speed: 40, range: 32, pitchDown: 9, floorExit: 0.3, maxBounces: 12, size: 0.16,
     puddleRadius: 1.35, directDamage: 35, directMark: 9, trailLife: 1.0, trailRadius: 0.42, trailDamage: 22, trailMark: 3,
   },
   boomerang: {
-    id: 'boomerang', name: 'Whirl Boomerang', kind: 'boomerang', blurb: 'Spins out, hovers and shreds, whirls back round you, then bursts. Hit a foe and it bursts on them like a Splat Bomb. One out at a time.',
+    id: 'boomerang', name: '回旋镖', kind: 'boomerang', blurb: '旋转飞出，悬停绞削，绕你回旋一圈后爆炸。命中敌人时会像墨汁炸弹一样在其身上爆开。同时只能存在一枚。',
     inkCost: 60, throwSpeed: 16,           // throwSpeed: only the bots' lob maths read it (the throw itself is flat)
     range: 9, outTime: 0.6,                // flat along the aim, easing to a stop ~9 m out (stops early at a wall)
     hover: 1.75, hoverRadius: 1.35, tickRate: 8, tickDamage: 9, hoverPaint: 1.0,   // shreds ≈ 72 dmg/s around it
@@ -409,41 +409,41 @@ export const SUB = SUBS; // older code reads SUB.bomb
 
 // Specials. Every special refills your ink tank when it starts. `duration` = how long a timed special lasts (s).
 export const SPECIALS = {
-  slam: { id: 'slam', name: 'Tidal Slam', blurb: 'Leap up and slam down in a huge ink shockwave.', rise: 0.55, hang: 0.25, radius: 5.2, killRadius: 3.2, damageMax: 180, damageMin: 55 },
-  storm: { id: 'storm', name: 'Ink Tempest', blurb: 'Hurl a rain cloud that soaks the turf below.', duration: 6.5, radius: 3.4, dps: 34, throwSpeed: 16, driftSpeed: 1.1 },
+  slam: { id: 'slam', name: '潮击重踏', blurb: '跃至高空，重重砸下，掀起巨大的墨汁冲击波。', rise: 0.55, hang: 0.25, radius: 5.2, killRadius: 3.2, damageMax: 180, damageMin: 55 },
+  storm: { id: 'storm', name: '墨水风暴', blurb: '掷出一朵雨云，浇透下方的地面。', duration: 6.5, radius: 3.4, dps: 34, throwSpeed: 16, driftSpeed: 1.1 },
   // Bomb Barrages: throw one kind of bomb as fast as you like (no ink) while the main weapon still works. Each variant
   // is its own special (kind 'barrage'); `gap` = the shortest time between throws.
-  barrage: { id: 'barrage', kind: 'barrage', bomb: 'bomb', name: 'Splat Bomb Barrage', blurb: 'Throw Splat Bombs as fast as you like for a few seconds — no ink needed. Your main weapon still works.', duration: 6.5, gap: 0.3 },
-  barrage_sticky: { id: 'barrage_sticky', kind: 'barrage', bomb: 'sticky', name: 'Cling Charge Barrage', blurb: 'Stick Cling Charges to every wall in sight — no ink needed. Your main weapon still works.', duration: 6.5, gap: 0.4 },
-  barrage_burst: { id: 'barrage_burst', kind: 'barrage', bomb: 'burst', name: 'Pop Pellet Barrage', blurb: 'Pelt foes with rapid-fire Pop Pellets — no ink needed. Your main weapon still works.', duration: 6.5, gap: 0.2 },
-  barrage_seeker: { id: 'barrage_seeker', kind: 'barrage', bomb: 'seeker', name: 'Skitter Bomb Barrage', blurb: 'Send a pack of Skitter Bombs chasing foes, each inking a trail — no ink needed. Your main weapon still works.', duration: 6.5, gap: 0.5 },
-  barrage_mist: { id: 'barrage_mist', kind: 'barrage', bomb: 'mist', name: 'Murk Bomb Barrage', blurb: 'Smother an area in Murk Bomb mist — no ink needed. Your main weapon still works.', duration: 6.5, gap: 0.45 },
+  barrage: { id: 'barrage', kind: 'barrage', bomb: 'bomb', name: '墨汁炸弹连爆', blurb: '在几秒内随心连扔墨汁炸弹——无需墨汁。主武器仍可正常使用。', duration: 6.5, gap: 0.3 },
+  barrage_sticky: { id: 'barrage_sticky', kind: 'barrage', bomb: 'sticky', name: '黏着炸药连爆', blurb: '把黏着炸药粘满眼前的每一面墙——无需墨汁。主武器仍可正常使用。', duration: 6.5, gap: 0.4 },
+  barrage_burst: { id: 'barrage_burst', kind: 'barrage', bomb: 'burst', name: '爆裂弹连爆', blurb: '用速射爆裂弹痛击敌人——无需墨汁。主武器仍可正常使用。', duration: 6.5, gap: 0.2 },
+  barrage_seeker: { id: 'barrage_seeker', kind: 'barrage', bomb: 'seeker', name: '疾走炸弹连爆', blurb: '放出一群疾走炸弹追击敌人，各自留下墨迹——无需墨汁。主武器仍可正常使用。', duration: 6.5, gap: 0.5 },
+  barrage_mist: { id: 'barrage_mist', kind: 'barrage', bomb: 'mist', name: '毒雾弹连爆', blurb: '用毒雾弹的毒雾笼罩一片区域——无需墨汁。主武器仍可正常使用。', duration: 6.5, gap: 0.45 },
   // force field: hits become knockback (reduced); touching teammates shares it
-  bubbler: { id: 'bubbler', name: 'Bubble Guard', blurb: 'A force field that turns every hit into a shove instead of damage. Touch teammates to share it.',
+  bubbler: { id: 'bubbler', name: '泡泡护罩', blurb: '一面力场，把每一次受击都化为推撞而非伤害。触碰队友可与其共享。',
     duration: 6.5, radius: 1.3, knockPerDamage: 0.045, knockMax: 6.5, shareRange: 1.5 },
   // reveals every enemy to your team (screen + map); they are slowed and burn ink faster
-  sonar: { id: 'sonar', name: 'Deep Sonar', blurb: 'Reveals every enemy to your team on screen and on the map. Revealed foes move slower and burn through ink faster.',
+  sonar: { id: 'sonar', name: '深海声呐', blurb: '在屏幕和地图上为全队揭示所有敌人。被揭示的敌人移速变慢，墨汁消耗更快。',
     duration: 8, slow: 0.8, inkMul: 1.4, cast: 0.6 },
   // pick a spot on the map; a missile lands there as a swirling ink vortex
-  strike: { id: 'strike', name: 'Vortex Strike', blurb: 'Pick a spot on the map and launch a missile. It lands as a huge swirling vortex of ink.',
+  strike: { id: 'strike', name: '漩涡空袭', blurb: '在地图上选定一处并发射导弹。它将化作巨大的墨汁漩涡落下。',
     aimTime: 7, flight: 2.2, radius: 5.5, duration: 4.5, dps: 62, pull: 1.6 },
   // bazooka: tall narrow twisters in quick succession, long range, one-shot splats
-  zooka: { id: 'zooka', name: 'Twister Zooka', blurb: 'A bazooka that fires tall twisters of ink in quick succession — splats foes at long range.',
+  zooka: { id: 'zooka', name: '龙卷火箭炮', blurb: '一门能连续射出高大墨汁龙卷的火箭炮——可远距离击倒敌人。',
     duration: 6, interval: 1.0, speed: 34, range: 44, damage: 180, height: 2.8, radius: 0.55, paintEvery: 0.7, paintRadius: 0.95 },
   // speaker: after a short charge, a sound wave in the aimed direction through walls; splats anything in it
-  wail: { id: 'wail', name: 'Howl Box', blurb: 'Hold up a huge speaker, aim it and click: it blasts a sound wave that goes through walls and splats anything in its path.',
+  wail: { id: 'wail', name: '咆哮音箱', blurb: '举起巨大的音箱，瞄准后按下：爆发出穿透墙壁的声波，击倒路径上的一切。',
     charge: 1.3, blast: 3.2, radius: 1.5, range: 72, dps: 260, holdTime: 6, holdSpeed: 3.2 },
   // invincible kraken: fast through any ink, splats with a jump attack
-  kraken: { id: 'kraken', name: 'Kraken', blurb: 'Turn into an invincible kraken. Race through any ink (even the enemy\'s) and splat foes with a jump attack.',
+  kraken: { id: 'kraken', name: '海妖', blurb: '化身无敌海妖。在任意墨汁中疾驰（包括敌方墨汁），用跳跃攻击击倒敌人。',
     duration: 7, speed: 7.2, hopVel: 10.5, attackVel: 8.5, attackFwd: 6.5, radius: 2.3, damage: 200, knockPerDamage: 0.02, cooldown: 0.65, paintRadius: 1.15 },
   // up to three giant bubbles: they wall off an area and burst into a deadly blast when your team shoots them
-  blower: { id: 'blower', name: 'Bubble Blower', blurb: 'Blow up to three giant bubbles that wall off an area. Shoot them (you or your team) to set off a huge ink blast.',
+  blower: { id: 'blower', name: '泡泡机', blurb: '吹出最多三个巨型泡泡，封锁一片区域。射击泡泡（你或你的队友）可引发巨大的墨汁爆炸。',
     duration: 9, max: 3, inflate: 1.0, rMin: 0.9, rMax: 2.1, drift: 1.4, life: 9, popDamage: 55, blastMul: 1.9, damageMax: 180, damageMin: 45 },
   // jetpack: hover and fire blaster-like shots; super jump back to the take-off point when it runs out
-  jetpack: { id: 'jetpack', name: 'Ink Jet', blurb: 'Hover over the stage firing powerful blasts — jump for a boost. When it runs out you super jump back to where you took off (marked for everyone to see).',
+  jetpack: { id: 'jetpack', name: '墨水喷射', blurb: '悬浮在场地上空发射强力爆弹——按跳跃可向上助推。特殊武器结束后，你会超级跳跃回到起飞点（所有人都能看到的标记）。',
     duration: 7, height: 3.8, speed: 5.5, accel: 11, boost: 9, boostGap: 0.9, interval: 0.55, projSpeed: 30, range: 34, directDamage: 125, splashMax: 70, splashMin: 30, splashRadius: 2.4, paintRadius: 1.5 },
   // giant stamp: slam repeatedly while advancing, jump attack, or throw it (ends the special)
-  stamp: { id: 'stamp', name: 'Mega Stamp', blurb: 'Charge forward smashing with a giant stamp: each swing deflects attacks from the front and smashes bombs before they go off, but it turns slowly and is open from the sides and back. Swing mid-air for a flip that reaches further and hits behind you too. Throw it (sub) as a long-range blast — that ends the special.',
+  stamp: { id: 'stamp', name: '巨型印章', blurb: '举着巨型印章向前冲锋猛砸：每次挥击都能弹开正面的攻击，并在炸弹引爆前将其砸毁，但转向缓慢，侧面和背后破绽大开。在空中挥击可翻转一圈，够得更远，也能打到身后。用副武器键把它掷出，化作远程爆炸——这会结束特殊武器。',
     duration: 7.5, interval: 0.42, reach: 1.6, radius: 1.55, damage: 200, lunge: 2.6, moveSpeed: 7.2, throwSpeed: 25, throwRadius: 3.2, throwDamageMax: 200, throwDamageMin: 60,
     // the body turns slowly while charging (quicker once stopped); sideways steps are short — charge, stop, turn, charge
     turnRate: 1.7, turnRateStill: 6.0, strafe: 0.35,
@@ -453,16 +453,16 @@ export const SPECIALS = {
     // swing in the air: one flip — hits behind you as the stamp goes over, then a longer-reaching smash in front
     flipTime: 0.5, flipReach: 2.7, flipRadius: 1.9, flipBackReach: 1.2, flipBackRadius: 1.6 },
   // a ball of ink held overhead charges over time (faster with "Yeah!" cheers); throw it once full for a huge blast
-  booyah: { id: 'booyah', name: 'Cheer Orb', blurb: 'Hold up a ball of ink that charges over time, then throw it for a huge blast. Teammates\' "Yeah!" cheers (C) charge it faster and top up their own special.',
+  booyah: { id: 'booyah', name: '欢呼球', blurb: '举着一颗随时间充能的墨汁球，扔出后引发巨大爆炸。队友的“好耶！”欢呼（C 键）能加快充能，并为自己积攒特殊武器。',
     charge: 4.5, cheer: 0.12, cheerSpecial: 12, autoThrow: 2.5, moveSpeed: 1.8, throwSpeed: 19.6, fuse: 1.5, radius: 8.4, killRadius: 4.6, damageMax: 220, damageMin: 60 },
   // grapple: the sub button fires a tether to latch onto surfaces and zip over; super jump back when it ends
-  zipcaster: { id: 'zipcaster', name: 'Zipline', blurb: 'Cloaked in a mysterious aura, your sub becomes a grapple: latch onto walls from afar and zip over, main weapon in hand. You super jump back when it ends (marked for everyone to see).',
+  zipcaster: { id: 'zipcaster', name: '飞索', blurb: '周身笼罩神秘光晕，副武器变为钩索：远距离钉住墙壁并飞身过去，主武器仍在手。结束后你会超级跳跃回到出发点（所有人都能看到的标记）。',
     duration: 8.5, range: 21, speed: 22, hang: 1.4, cooldown: 0.35,
     // body impact at the end of every zip (or on an enemy met mid-zip): a mini explosion
     impactDirect: 100, impactSplash: 30, impactDirectR: 1.0, impactRadius: 2.4 },
   // ride a crab tank: gatling (main), mortar (sub), roll into an armoured ball (swim); the tank has HP, the rider is
   // exposed from above and behind
-  crab: { id: 'crab', name: 'Crab Rig', blurb: 'Ride a crab tank: gatling on fire, mortar on sub, roll into an armoured ball with swim. The tank can be shot down, and you\'re exposed from above and behind.',
+  crab: { id: 'crab', name: '螃蟹战车', blurb: '驾驶螃蟹坦克：射击键机炮扫射，副武器键发射迫击炮，游泳键蜷成装甲球滚动。坦克可能被击毁，你的上方和背后暴露在外。',
     duration: 9, hp: 460, speed: 3.0, rollSpeed: 9.5, turnRate: 1.5, gunInterval: 0.075, gunDamage: 18, gunSpeed: 36, gunRange: 22, gunSpread: 3.5,
     cannonGap: 1.15, cannonSpeed: 17, cannonRadius: 3.0, cannonDamageMax: 150, cannonDamageMin: 40, rollArmor: 0.35 },
 };
@@ -502,9 +502,9 @@ export const ZONES = {
 
 export const DIFFICULTY = {
   // aimOmega / aimTurn: bot aim spring stiffness (rad/s) and turn-rate cap (rad/s) — see bots.js
-  easy:   { id: 'easy',   name: 'Chill',  reaction: 0.55, aimError: 0.11, fireDiscipline: 0.55, awareness: 16, aimOmega: 9,  aimTurn: 7 },
-  normal: { id: 'normal', name: 'Fresh',  reaction: 0.32, aimError: 0.06, fireDiscipline: 0.8,  awareness: 21, aimOmega: 13, aimTurn: 10 },
-  hard:   { id: 'hard',   name: 'Fierce', reaction: 0.17, aimError: 0.03, fireDiscipline: 0.95, awareness: 26, aimOmega: 18, aimTurn: 14 },
+  easy:   { id: 'easy',   name: '简单',  reaction: 0.55, aimError: 0.11, fireDiscipline: 0.55, awareness: 16, aimOmega: 9,  aimTurn: 7 },
+  normal: { id: 'normal', name: '普通',  reaction: 0.32, aimError: 0.06, fireDiscipline: 0.8,  awareness: 21, aimOmega: 13, aimTurn: 10 },
+  hard:   { id: 'hard',   name: '困难', reaction: 0.17, aimError: 0.03, fireDiscipline: 0.95, awareness: 26, aimOmega: 18, aimTurn: 14 },
 };
 
 // Every stage can be played by day or at dusk: `times` maps the time of day to an environment theme (`theme` is the
@@ -513,15 +513,15 @@ export const TIMES = ['day', 'dusk'];
 export const mapTheme = (map, time = 'day') => (map && map.times && map.times[time]) || (map && map.theme) || 'day';
 
 export const MAPS = [
-  { id: 'tidewater', name: 'Tidewater Plaza', blurb: 'A Victorian seaside square: fight round the Jubilee clock tower, under the colonnade and along the promenade.', theme: 'day', times: { day: 'day', dusk: 'sunset' } },
-  { id: 'kelpline', name: 'Kelpline Terminal', blurb: 'A container terminal at shift change: a gantry crane straddles the pier between two moored ships. Mind the water.', theme: 'day', times: { day: 'day', dusk: 'sunset' } },
-  { id: 'halyard', name: 'Halyard Marina', blurb: 'Floating docks, a tug on blocks and a car ferry moored across the middle. Mind the water.', theme: 'golden', times: { day: 'golden', dusk: 'sunset' } },
-  { id: 'saltpan', name: 'Saltpan Basin', blurb: 'An open salt works: sunken pans and boardwalks round a wind pump, with the shed roof and salt heap as high ground.', theme: 'day', times: { day: 'day', dusk: 'sunset' } },
-  { id: 'crossmarket', name: 'Crossroads Market', blurb: 'Narrow shop streets and an iron gallery close in on the glass Market Hall, where the No. 3 tram waits under the clock.', theme: 'golden', times: { day: 'golden', dusk: 'sunset' } },
-  { id: 'lockgate', name: 'Lockgate Canals', blurb: 'Drained locks through a brick warehouse district: the canal splits the map, so hold the bridge and the gates.', theme: 'day', times: { day: 'day', dusk: 'sunset' } },
-  { id: 'terraces', name: 'Terrace Heights', blurb: 'A whitewashed hill village: hold the terraces, fight for the stairs and drop in on the Piazzetta.', theme: 'golden', times: { day: 'golden', dusk: 'sunset' } },
+  { id: 'tidewater', name: '潮水广场', blurb: '维多利亚风格的海滨广场：在朱比利钟塔周围、柱廊之下与海滨长廊上一决高下。', theme: 'day', times: { day: 'day', dusk: 'sunset' } },
+  { id: 'kelpline', name: '海带线码头', blurb: '换班时分的集装箱码头：一座龙门吊横跨码头，两侧停泊着货轮。当心落水。', theme: 'day', times: { day: 'day', dusk: 'sunset' } },
+  { id: 'halyard', name: '帆索游艇港', blurb: '漂浮的码头、架上支架的拖船，还有一艘汽车渡轮停在场地中央。当心落水。', theme: 'golden', times: { day: 'golden', dusk: 'sunset' } },
+  { id: 'saltpan', name: '盐田湾', blurb: '开阔的晒盐场：下沉的盐池与木板道环绕着一座风车泵，棚屋顶和盐堆是制高点。', theme: 'day', times: { day: 'day', dusk: 'sunset' } },
+  { id: 'crossmarket', name: '十字路口集市', blurb: '狭窄的店铺街与铁艺连廊环抱着玻璃市场大厅，3 号电车在时钟下静候。', theme: 'golden', times: { day: 'golden', dusk: 'sunset' } },
+  { id: 'lockgate', name: '闸门运河', blurb: '砖砌仓库区中放空水位的船闸：运河把地图一分为二，务必守住桥与闸门。', theme: 'day', times: { day: 'day', dusk: 'sunset' } },
+  { id: 'terraces', name: '台地高地', blurb: '白墙的山腰村落：守住台地，争夺阶梯，空降到小广场上。', theme: 'golden', times: { day: 'golden', dusk: 'sunset' } },
   // (src/world/stages/cargo, ported from PR #8's rebuilt Kelpline) — online only, humans only, never a Boss Battle
-  { id: 'cargo', name: 'Cargo Terminal', blurb: 'A container terminal at shift change: a gantry crane straddles the pier between two moored box ships.', theme: 'day', times: { day: 'day', dusk: 'sunset' }, onlineOnly: true, noBots: true, noBoss: true },
+  { id: 'cargo', name: '集装箱码头', blurb: '换班时分的集装箱码头：一座龙门吊横跨码头，两侧停泊着集装箱货轮。', theme: 'day', times: { day: 'day', dusk: 'sunset' }, onlineOnly: true, noBots: true, noBoss: true },
 ];
 // Stage rules (a MAPS entry's flags), enforced by the lobby host (net/session.js, net/mock.js), the menus and main.js:
 //   onlineOnly  only in the online lobby's stage picker — never the offline Play flow (Turf War or Boss Battle)
@@ -539,14 +539,14 @@ export const bossFallbackMap = (prefer) => (mapBossOk(prefer) ? prefer : (MAPS.f
 export function noBotsStartBlock(lobby) {
   if (!lobby || !mapNoBots(lobby.map)) return null;
   const ps = lobby.players || [];
-  if (ps.length < 2) return 'Needs 2+ players — no bots on this stage';
-  if (!ps.some((p) => p.team === 0) || !ps.some((p) => p.team === 1)) return 'Needs a player on each team';
+  if (ps.length < 2) return '此场地没有机器人，至少需要 2 名玩家';
+  if (!ps.some((p) => p.team === 0) || !ps.some((p) => p.team === 1)) return '双方队伍都需要至少 1 名玩家';
   return null;
 }
 
 export const BOT_NAMES = [
-  'Squiddo', 'Blotch', 'Marlo', 'Inky Vee', 'Pip', 'Coral', 'Riptide', 'Nori', 'Suki', 'Zest',
-  'Kelp', 'Drip', 'Tako', 'Sprinkle', 'Bubbles', 'Moxie', 'Juno', 'Wasabi', 'Fizz', 'Loop',
+  '咸鱼一条', '墨渍渍', '浪里条', '墨汁拌饭', '小墨点', '珊瑚糖', '离岸流', '海苔卷', '寿喜烧', '柠檬皮',
+  '海带结', '滴答墨', '章鱼烧', '糖粒粒', '泡泡浴', '混世蘑', '小朱诺', '芥末墩', '气泡水', '绕圈圈',
 ];
 
 // ---- Progression ----
