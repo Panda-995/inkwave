@@ -1,0 +1,13 @@
+# Keep the build context lean: the image needs the game (index.html, src, styles, vendor, assets,
+# songs), the relay (server), tools/docker and build/music-manifest.mjs — nothing else.
+.git
+.github
+node_modules
+dist
+docs
+tools/botlab
+.botlab
+electron
+*.md
+!songs/README.md
+.DS_Store
