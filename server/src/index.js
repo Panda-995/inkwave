@@ -2,6 +2,10 @@
 //
 //   GET /room/<CODE>?name=<name>&create=1&v=<proto>   (WebSocket upgrade) → the Room object for that code
 //   GET /health                                          → "ok"
+//   POST /auth/register {name,password}                  → {name, token}   (account store, see Store below)
+//   POST /auth/login    {name,password}                  → {name, token}
+//   GET  /profile            Authorization: Bearer <t>   → {name, updatedAt, data}
+//   PUT  /profile            Authorization: Bearer <t>   → {updatedAt}     (data = {settings, profile})
 //
 // A Room is a dumb, fast fan-out: game payloads are forwarded as raw strings (never parsed here). The room only
 // tracks membership (id, name, join order), elects the host (the oldest member), and refuses joins that can't work
@@ -32,6 +36,9 @@ export default {
   async fetch(req, env) {
     const url = new URL(req.url);
     if (url.pathname === '/health') return new Response('ok', { headers: { 'access-control-allow-origin': '*' } });
+    // account + cloud-save endpoints live in one global Store object (the game page is served from a
+    // different port than the relay, so browsers preflight these with OPTIONS — answered inside the Store)
+    if (/^\/(auth|profile)(\/|$)/.test(url.pathname)) return env.STORE.get(env.STORE.idFromName('accounts')).fetch(req);
     const m = url.pathname.match(/^\/room\/([A-Za-z0-9]+)$/);
     if (!m) return new Response('INKWAVE relay', { status: 404 });
     const code = m[1].toUpperCase();
@@ -41,6 +48,102 @@ export default {
     return env.ROOMS.get(env.ROOMS.idFromName(code)).fetch(req);
   },
 };
+
+// ------------------------------------------------------------------------------------------------------------
+// Account store: one global Durable Object holding every user record. Cloudflare Workers' own storage API
+// persists to disk under `.wrangler/state` in local dev — which is exactly the directory the Docker image
+// volume-maps, so accounts and cloud saves survive container rebuilds. Each record:
+//   user:<name> → { name, salt, hash, created, tokens:[…], data:{settings,profile}|null, updatedAt }
+//   token:<tok> → <name>   (bearer tokens; a few live per user so several devices stay signed in)
+// Passwords are PBKDF2-SHA-256 (100k iterations, per-user salt) — WebCrypto is available in the runtime.
+const NAME_OK = /^[\p{L}\p{N}_.-]{2,16}$/u, PW_MIN = 4, DATA_MAX = 65536, TOKENS_MAX = 8;
+const b64 = (buf) => btoa(String.fromCharCode(...new Uint8Array(buf)));
+const hex = (n) => [...crypto.getRandomValues(new Uint8Array(n))].map((b) => b.toString(16).padStart(2, '0')).join('');
+
+async function pbkdf2(password, saltB64) {
+  const salt = Uint8Array.from(atob(saltB64), (c) => c.charCodeAt(0));
+  const key = await crypto.subtle.importKey('raw', new TextEncoder().encode(password), 'PBKDF2', false, ['deriveBits']);
+  return b64(await crypto.subtle.deriveBits({ name: 'PBKDF2', salt, iterations: 100000, hash: 'SHA-256' }, key, 256));
+}
+
+const corsHeaders = (req) => {
+  // the game serves from :8490 and talks to the relay on :8787 — echo the origin so any LAN host works
+  const o = req.headers.get('Origin') || '*';
+  return {
+    'access-control-allow-origin': o,
+    'access-control-allow-methods': 'GET, POST, PUT, OPTIONS',
+    'access-control-allow-headers': 'content-type, authorization',
+    'access-control-max-age': '86400',
+  };
+};
+const json = (req, obj, status = 200) => new Response(JSON.stringify(obj), { status, headers: { 'content-type': 'application/json', ...corsHeaders(req) } });
+
+export class Store extends DurableObject {
+  async fetch(req) {
+    const url = new URL(req.url);
+    if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: corsHeaders(req) });
+    try {
+      if (req.method === 'POST' && url.pathname === '/auth/register') return await this._register(req);
+      if (req.method === 'POST' && url.pathname === '/auth/login') return await this._login(req);
+      if (url.pathname === '/profile' && req.method === 'GET') return await this._get(req);
+      if (url.pathname === '/profile' && req.method === 'PUT') return await this._put(req);
+      return json(req, { e: 'not found' }, 404);
+    } catch (e) {
+      return json(req, { e: '中继存储出错，请重试' }, 500);
+    }
+  }
+
+  async _register(req) {
+    let body; try { body = await req.json(); } catch { return json(req, { e: '请求格式错误' }, 400); }
+    const name = String(body.name || '').trim(), pw = String(body.password || '');
+    if (!NAME_OK.test(name)) return json(req, { e: '用户名需为 2–16 个字符（汉字、字母、数字、._-）' }, 400);
+    if (pw.length < PW_MIN || pw.length > 64) return json(req, { e: `密码至少 ${PW_MIN} 位` }, 400);
+    const key = 'user:' + name.toLowerCase();
+    if (await this.ctx.storage.get(key)) return json(req, { e: '这个用户名已被注册' }, 409);
+    const salt = hex(16), token = hex(24);
+    const rec = { name, salt, hash: await pbkdf2(pw, salt), created: Date.now(), tokens: [token], data: null, updatedAt: 0 };
+    await this.ctx.storage.put(key, rec);
+    await this.ctx.storage.put('token:' + token, name.toLowerCase());
+    return json(req, { name, token });
+  }
+
+  async _login(req) {
+    let body; try { body = await req.json(); } catch { return json(req, { e: '请求格式错误' }, 400); }
+    const rec = await this.ctx.storage.get('user:' + String(body.name || '').trim().toLowerCase());
+    const hash = rec ? await pbkdf2(String(body.password || ''), rec.salt) : '';
+    if (!rec || hash !== rec.hash) return json(req, { e: '用户名或密码不对' }, 401);
+    const token = hex(24);
+    rec.tokens = [...rec.tokens.slice(-(TOKENS_MAX - 1)), token];
+    await this.ctx.storage.put('user:' + rec.name.toLowerCase(), rec);
+    await this.ctx.storage.put('token:' + token, rec.name.toLowerCase());
+    return json(req, { name: rec.name, token });
+  }
+
+  async _user(req) {
+    const token = (req.headers.get('authorization') || '').replace(/^Bearer\s+/i, '');
+    if (!token || token.length > 128) return null;
+    const name = await this.ctx.storage.get('token:' + token);
+    return name ? this.ctx.storage.get('user:' + name) : null;
+  }
+
+  async _get(req) {
+    const rec = await this._user(req);
+    if (!rec) return json(req, { e: '登录状态已失效，请重新登录' }, 401);
+    return json(req, { name: rec.name, updatedAt: rec.updatedAt || 0, data: rec.data || null });
+  }
+
+  async _put(req) {
+    const rec = await this._user(req);
+    if (!rec) return json(req, { e: '登录状态已失效，请重新登录' }, 401);
+    let body; try { body = await req.json(); } catch { return json(req, { e: '请求格式错误' }, 400); }
+    const raw = JSON.stringify(body.data ?? null);
+    if (raw.length > DATA_MAX) return json(req, { e: '存档过大' }, 413);
+    rec.data = body.data ?? null;
+    rec.updatedAt = Date.now();
+    await this.ctx.storage.put('user:' + rec.name.toLowerCase(), rec);
+    return json(req, { updatedAt: rec.updatedAt });
+  }
+}
 
 export class Room extends DurableObject {
   constructor(ctx, env) {

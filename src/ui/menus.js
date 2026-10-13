@@ -25,12 +25,13 @@ import {
 } from './menu-art.js';
 import { bossSilhouette, bossEmblem, BOSS_GLYPH, BOSS_NAME, BOSS_EPITHET } from './boss-art.js';
 import { WhatsNew } from './news.js';
+import * as accounts from '../net/accounts.js';
 
-const SCREENS = ['loading', 'title', 'main', 'mode', 'loadout', 'setup', 'locker', 'settings', 'howto', 'credits', 'pause', 'results', 'online', 'lobby'];
+const SCREENS = ['loading', 'title', 'main', 'mode', 'loadout', 'setup', 'locker', 'settings', 'howto', 'credits', 'pause', 'results', 'online', 'lobby', 'account'];
 // Transitions that get the full-screen ink wipe (the rest use staggered pop-ins).
 const WIPES = new Set(['loading>title', 'title>main', 'results>main', 'pause>main', 'results>null', 'pause>title', 'online>lobby', 'lobby>online', 'lobby>main', 'results>lobby', 'pause>online']);
 // Pushes/pops between these get the light ink swipe (decorative — the swap itself is immediate).
-const LIGHT = new Set(['main', 'mode', 'loadout', 'setup', 'locker', 'settings', 'howto', 'credits', 'pause', 'online', 'lobby']);
+const LIGHT = new Set(['main', 'mode', 'loadout', 'setup', 'locker', 'settings', 'howto', 'credits', 'pause', 'online', 'lobby', 'account']);
 // ?netmock=1 → an offline stand-in for G.net (src/net/mock.js) so the online screens work without the relay
 const NETMOCK = typeof location !== 'undefined' && new URLSearchParams(location.search).get('netmock') === '1';
 // room codes (the session generates them from this set: no O/0, I/1)
@@ -877,6 +878,119 @@ export class Menus {
     };
   }
 
+  // ================================================================ SCREEN: account
+  // Text field styled exactly like the splashtag name row (.iw-name), but standalone — the account
+  // forms are the one place the game asks for typed credentials, so they reuse that row's look.
+  _acctRow(labelText, { type = 'text', max = 16, autocomplete = 'off' } = {}) {
+    const input = h('input', { class: 'iw-name__input', type, maxlength: String(max), spellcheck: 'false', autocomplete });
+    const row = h('div', { class: 'iw-name iw-acct__row' }, h('span', { class: 'iw-name__label' }, labelText), h('span', { class: 'iw-name__field' }, input));
+    row._input = input;
+    // keep the special keys away from the menu navigator while typing (same deal as the name row)
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === 'NumpadEnter' || e.key === 'Escape'
+        || e.key === 'ArrowUp' || e.key === 'ArrowDown' || e.key === 'Tab') { e.preventDefault(); e.stopPropagation(); input.blur(); }
+    });
+    return row;
+  }
+
+  /** Shared login/register flow: sign in on the relay, then cloud-wins pull (reload) or first-push adopt. */
+  async _accountEnter(mode, name, pass, stat, card) {
+    name = String(name || '').trim();
+    if (name.length < 2 || name.length > 16 || String(pass || '').length < 4) {
+      stat.textContent = '用户名 2–16 个字符，密码至少 4 位';
+      restartAnim(card, 'is-shake');
+      this._sfx('ui_error');
+      return;
+    }
+    stat.textContent = mode === 'login' ? '登录中…' : '注册中…';
+    try {
+      const r = mode === 'login' ? await accounts.login(name, pass) : await accounts.register(name, pass);
+      accounts.saveToken(r.name, r.token);
+      let remote = null;
+      try { remote = await accounts.pull(r.token); } catch { /* relay hiccup — stay on local data */ }
+      const hasData = remote && remote.data
+        && ((remote.data.settings && Object.keys(remote.data.settings).length) || (remote.data.profile && Object.keys(remote.data.profile).length));
+      if (hasData) {
+        // cloud wins: write both blobs and boot again, so the renderer tier and every screen pick them up
+        if (remote.data.settings && Object.keys(remote.data.settings).length) localStorage.setItem('inkwave.settings', JSON.stringify(remote.data.settings));
+        if (remote.data.profile && Object.keys(remote.data.profile).length) localStorage.setItem('inkwave.profile', JSON.stringify(remote.data.profile));
+        accounts.setSyncedAt(remote.updatedAt);
+        location.reload();
+        return;
+      }
+      // empty cloud (fresh account): adopt this browser's save as the account's
+      const p = await accounts.push(r.token, { settings: G.settings, profile: G.profile }).catch(() => null);
+      if (p && p.updatedAt) accounts.setSyncedAt(p.updatedAt);
+      this.toast(mode === 'login' ? `已登录：${r.name} · 本机进度已收录到云端` : `已注册：${r.name} · 进度将随账号自动保存`, { kind: 'good', icon: GLYPHS.check });
+      this._go('main');
+    } catch (e) {
+      stat.textContent = e.message || '操作失败，请重试';
+      restartAnim(card, 'is-shake');
+      this._sfx('ui_error');
+    }
+  }
+
+  _scr_account() {
+    const acc = accounts.current();
+    const body = h('div', { class: 'iw-hub__body iw-acct__body' });
+
+    if (acc) {
+      // ---- signed in: identity + manual sync controls (everything else syncs automatically)
+      const stat = h('span', { class: 'iw-acct__status' }, '改动会自动同步 · 几秒内上传到中继');
+      const syncBtn = this._btn({ id: 'acct-sync', label: '立即同步', icon: GLYPHS.reset, cls: 'iw-btn--primary', accept: async () => {
+        syncBtn.disabled = true;
+        stat.textContent = '同步中…';
+        const r = await G.accountsSync?.syncNow();
+        syncBtn.disabled = false;
+        if (r && r.pulled) { location.reload(); return; }   // the cloud was newer — boot applies it everywhere
+        stat.textContent = r ? `已同步 · ${new Date(r.updatedAt || Date.now()).toLocaleTimeString()}` : '同步失败，请检查中继后重试';
+        this._sfx(r ? 'ui_confirm' : 'ui_error');
+      } });
+      const outBtn = this._btn({ id: 'acct-out', label: '退出登录', icon: GLYPHS.exit, accept: () => {
+        accounts.logout();
+        this.toast('已退出登录 · 本机数据保留', { kind: 'info', icon: GLYPHS.exit });
+        this._go('main');
+      } });
+      body.append(this._panel('iw-acct__panel iw-in iw-in--left',
+        h('span', { class: 'iw-hubcard__kicker iw-tape' }, h('i', { html: GLYPHS.users }), '当前账号'),
+        h('div', { class: 'iw-acct__name iw-display' }, acc.name),
+        h('div', { class: 'iw-acct__note' }, '设置、配装与成长进度自动随账号保存；换浏览器或换设备，登录即恢复。'),
+        stat,
+        h('div', { class: 'iw-acct__btns' }, syncBtn, outBtn)));
+    } else {
+      // ---- logged out: login + register cards, the online hub's visual language
+      const mk = (mode) => {
+        const u = this._acctRow('用户名', { max: 16 });
+        const p = this._acctRow('密码', { type: 'password', max: 64, autocomplete: mode === 'login' ? 'current-password' : 'new-password' });
+        const stat = h('span', { class: 'iw-acct__status' });
+        const go = h('button', { class: 'iw-btn iw-btn--primary iw-btn--wide iw-acct__go', type: 'button' },
+          h('span', { class: 'iw-btn__blob' }), h('span', { class: 'iw-btn__label' }, mode === 'login' ? '登 录' : '注 册'));
+        const card = h('div', { class: 'iw-hubcard iw-acct__card iw-in iw-in--left', style: { '--tilt': mode === 'login' ? '-1.4deg' : '1.2deg' } },
+          h('span', { class: 'iw-hubcard__bg' }, h('span', { class: 'iw-hubcard__ink' })),
+          h('span', { class: 'iw-hubcard__text' },
+            h('span', { class: 'iw-hubcard__kicker iw-tape' }, h('i', { html: mode === 'login' ? GLYPHS.key : GLYPHS.plus }), mode === 'login' ? '已有账号？' : '第一次玩？'),
+            h('span', { class: 'iw-hubcard__title' }, mode === 'login' ? '登录' : '注册新账号'),
+            h('span', { class: 'iw-acct__rows' }, u, p),
+            h('span', { class: 'iw-acct__note' }, mode === 'login' ? '登录后拉取这个账号的云端存档。' : '注册会把本机当前进度收录为你的云端存档。'),
+            stat),
+          go);
+        const submit = () => { if (!go.disabled) { go.disabled = true; this._accountEnter(mode, u._input.value, p._input.value, stat, card).finally(() => { go.disabled = false; }); } };
+        go.addEventListener('mousedown', (e) => e.preventDefault());
+        go.addEventListener('click', (e) => { e.stopPropagation(); this._sfx('ui_click'); submit(); });
+        for (const inp of [u._input, p._input]) inp.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === 'NumpadEnter') submit(); });
+        return card;
+      };
+      body.append(mk('login'), mk('register'));
+    }
+
+    const el = h('div', { class: 'iw-screen iw-account' },
+      h('div', { class: 'iw-scrim-left' }),
+      this._header('账号', { sub: '存档随账号走 · 数据保存在你的中继里' }),
+      body,
+      this._prompts([['Esc', 'B', '返回']]));
+    return { el, initial: '[data-id]' };
+  }
+
   // ================================================================ SCREEN: main
   _scr_main() {
     const prof = this._profile();
@@ -884,6 +998,7 @@ export class Menus {
     const W = this._weapons()[lo.weapon];
     const sp = this._special();
     const sub = this._sub();
+    const signedIn = accounts.current();
     const items = [
       { id: 'play', label: '开始游戏', sub: '占地对战 · 区域控制 · 头目战', icon: GLYPHS.play, cls: 'iw-btn--menu iw-btn--xl iw-btn--primary', accept: () => this._go('mode'), sound: 'ui_confirm' },
       { id: 'online', label: '在线对战', sub: '与好友同乐 · 私密房间', icon: GLYPHS.online, cls: 'iw-btn--menu iw-btn--online', accept: () => this._go('online'), sound: 'ui_confirm',
@@ -891,6 +1006,7 @@ export class Menus {
       { id: 'loadout', label: '配装', icon: weaponIcon(W.kind || lo.weapon), cls: 'iw-btn--menu', accept: () => this._go('loadout') },
       { id: 'locker', label: '更衣室', icon: GLYPHS.hanger, cls: 'iw-btn--menu', accept: () => this._go('locker') },
       { id: 'settings', label: '设置', icon: GLYPHS.gear, cls: 'iw-btn--menu', accept: () => this._go('settings') },
+      { id: 'account', label: '账号', sub: signedIn ? `${signedIn.name} · 云端同步` : '进度仅存本机 · 点按登录', icon: GLYPHS.users, cls: 'iw-btn--menu', accept: () => this._go('account') },
       { id: 'howto', label: '玩法说明', icon: GLYPHS.question, cls: 'iw-btn--menu', accept: () => this._go('howto') },
       { id: 'credits', label: '制作名单', icon: GLYPHS.star, cls: 'iw-btn--menu', accept: () => this._go('credits') },
     ];

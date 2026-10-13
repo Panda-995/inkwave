@@ -29,13 +29,14 @@
 
 ## 中文版 · 自托管 Docker 部署
 
-本 fork 在上游基础上提供了**完整简体中文界面**（菜单、HUD、武器与场地名、结算与教程文案均已汉化），并新增了开箱即用的 Docker 镜像：一个容器同时跑静态游戏（`:8490`）和局域网联机中继（`:8787`），支持 amd64 / arm64 双架构。
+本 fork 在上游基础上提供了**完整简体中文界面**（菜单、HUD、武器与场地名、结算与教程文案均已汉化），并新增了开箱即用的 Docker 镜像：一个容器同时跑静态游戏（`:8490`）和局域网联机中继（`:8787`），支持 amd64 / arm64 双架构。中继同时承载**账号与云端存档**（注册/登录后设置与进度随账号保存，卷映射持久化）。
 
 ```bash
-docker run -d --name inkwave --restart unless-stopped -p 8490:8490 -p 8787:8787 ghcr.io/panda-995/inkwave:latest
+mkdir -p inkwave-data
+docker run -d --name inkwave --restart unless-stopped -p 8490:8490 -p 8787:8787   -v "$PWD/inkwave-data:/app/server/.wrangler/state" ghcr.io/panda-995/inkwave:latest
 ```
 
-浏览器打开 `http://<主机IP>:8490` 即可游玩；从局域网地址打开的页面会自动连接 `ws://<主机IP>:8787` 的联机中继（见 `src/net/transport.js`）。若 8787 端口被占用，请改用 `?relay=ws://<主机IP>:<端口>` 参数手动指定。镜像构建见 [.github/workflows/docker.yml](.github/workflows/docker.yml)。
+浏览器打开 `http://<主机IP>:8490` 即可游玩；从局域网地址打开的页面会自动连接 `ws://<主机IP>:8787` 的联机中继（见 `src/net/transport.js`）。若 8787 端口被占用，请改用 `?relay=ws://<主机IP>:<端口>` 参数手动指定。主菜单 → **账号** 即可注册/登录；账号与存档数据全部落在中继的 `.wrangler/state` 目录（上面命令已做卷映射，重建容器不丢）。镜像构建与端到端测试见 [.github/workflows/docker.yml](.github/workflows/docker.yml)。
 
 ---
 

@@ -2777,3 +2777,16 @@ circle.iw-ico-cut { fill: var(--cut, #fff); }
 .iw-mode__zone { display: block; width: calc(var(--u) * 8); height: calc(var(--u) * 8); color: #fff; filter: drop-shadow(0 calc(var(--u) * .35) 0 var(--k)); }
 .iw-mode__zone svg { width: 100%; height: 100%; }
 .iw-mode--zones.is-focus .iw-mode__zone { animation: iw-mode-bob 1.2s ease-in-out infinite .25s; }
+
+/* ------------------------------------------------------------------ account (login / cloud save)
+   Reuses the online hub's cards (.iw-hubcard), panels (.iw-panel) and the splashtag name rows
+   (.iw-name*) so the screen reads as part of the same UI; only the small layout bits are new. */
+.iw-acct__card { cursor: default; }
+.iw-acct__rows { display: grid; gap: calc(var(--u) * .9); margin: calc(var(--u) * 1.1) 0 calc(var(--u) * .2); }
+.iw-acct__note { display: block; font: 500 var(--fs-xs) / 1.5 'Rubik', system-ui, 'PingFang SC', 'Microsoft YaHei', sans-serif; opacity: .68; }
+.iw-acct__status { display: block; min-height: calc(var(--u) * 1.8); font: 600 var(--fs-xs) / 1.4 'Rubik', system-ui, 'PingFang SC', 'Microsoft YaHei', sans-serif; color: var(--a-light); margin-top: calc(var(--u) * .5); }
+.iw-acct__go { margin-top: calc(var(--u) * 1.2); flex: none; }
+.iw-acct__panel { display: flex; flex-direction: column; gap: calc(var(--u) * .8); padding: calc(var(--u) * 1.7); }
+.iw-acct__name { font-size: calc(var(--fs-l) * 1.6); }
+.iw-acct__btns { display: flex; gap: calc(var(--u) * 1); margin-top: calc(var(--u) * 1.2); }
+.iw-acct__btns .iw-btn { flex: 1; }

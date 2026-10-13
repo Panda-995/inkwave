@@ -52,9 +52,10 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-  # Runtime smoke: boot the just-pushed image, verify the web build serves the Chinese page and
-  # that the wrangler/workerd relay actually comes up on :8787 (an HTTP response of any code
-  # proves workerd is listening; the relay itself only speaks WebSocket).
+  # Runtime smoke: boot the just-pushed image, verify the web build serves the Chinese page, that the
+  # wrangler/workerd relay comes up on :8787, and — end to end — that the account store keeps each
+  # user's cloud save separate and survives being torn down and recreated on the same volume (the
+  # docker-compose ./inkwave-data mapping).
   smoke:
     needs: image
     runs-on: ubuntu-latest
@@ -66,15 +67,80 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: boot + probe
         run: |
+          IMAGE=ghcr.io/panda-995/inkwave:sha-${GITHUB_SHA::7}
+          B=http://127.0.0.1:8787
+          fail() { echo "FAIL: $*"; docker logs inkwave 2>&1 | tail -40; exit 1; }
+          J() { python3 -c "import json,sys;print(json.load(sys.stdin).get('$1',''))" 2>/dev/null; }
+
+          docker volume create inkwave-data >/dev/null
           docker run -d --name inkwave -p 8490:8490 -p 8787:8787 \
-            ghcr.io/panda-995/inkwave:sha-${GITHUB_SHA::7}
+            -v inkwave-data:/app/server/.wrangler/state "$IMAGE"
           for i in $(seq 1 30); do
             curl -sf -o /dev/null http://127.0.0.1:8490/ && break || sleep 2
           done
           TITLE=$(curl -sf http://127.0.0.1:8490/)
-          echo "$TITLE" | grep -q 'INKWAVE — 占地大乱斗' || { echo 'web page missing Chinese title'; docker logs inkwave; exit 1; }
-          curl -sf -o /dev/null http://127.0.0.1:8490/src/main.js || { echo 'module serving broken'; docker logs inkwave; exit 1; }
-          CODE=$(curl -s -o /dev/null -w '%{http_code}' --max-time 10 http://127.0.0.1:8787/)
-          [ "$CODE" != "000" ] || { echo 'relay port not answering'; docker logs inkwave; exit 1; }
-          echo "smoke ok: web served, relay answered HTTP $CODE"
-          docker logs inkwave 2>&1 | tail -20
+          echo "$TITLE" | grep -q 'INKWAVE — 占地大乱斗' || fail 'web page missing Chinese title'
+          curl -sf -o /dev/null http://127.0.0.1:8490/src/main.js || fail 'module serving broken'
+          for i in $(seq 1 30); do
+            curl -sf $B/health >/dev/null 2>&1 && break || sleep 2
+          done
+          [ "$(curl -sf $B/health)" = 'ok' ] || fail 'relay /health never came up'
+          CODE=$(curl -s -o /dev/null -w '%{http_code}' --max-time 10 $B/)
+          [ "$CODE" != "000" ] || fail 'relay port not answering'
+          echo "smoke: web served, relay alive (HTTP $CODE)"
+
+          # ---- CORS preflight (game page :8490 → relay :8787 is cross-origin)
+          OPT=$(curl -s -o /dev/null -w '%{http_code}' -X OPTIONS $B/auth/login -H 'Origin: http://192.168.1.50:8490' -H 'Access-Control-Request-Method: POST')
+          [ "$OPT" = '204' ] || fail "OPTIONS preflight → $OPT (want 204)"
+          ACAO=$(curl -s -i -X OPTIONS $B/auth/login -H 'Origin: http://192.168.1.50:8490' -H 'Access-Control-Request-Method: POST' | grep -i '^access-control-allow-origin:' | tr -d '\r' | awk '{print $2}')
+          [ "$ACAO" = 'http://192.168.1.50:8490' ] || fail "ACAO echo got '$ACAO'"
+          echo "smoke: CORS preflight ok (origin echoed)"
+
+          # ---- register two users; each must get their own token
+          TA=$(curl -s -X POST $B/auth/register -H 'Content-Type: application/json' -d '{"name":"alice","password":"wonder1"}' | J token)
+          TB=$(curl -s -X POST $B/auth/register -H 'Content-Type: application/json' -d '{"name":"bob","password":"builder2"}' | J token)
+          [ -n "$TA" ] && [ -n "$TB" ] || fail 'register did not return tokens'
+          [ "$TA" != "$TB" ] || fail 'two users got the same token'
+          DUP=$(curl -s -o /dev/null -w '%{http_code}' -X POST $B/auth/register -H 'Content-Type: application/json' -d '{"name":"alice","password":"whatever"}')
+          [ "$DUP" = '409' ] || fail "duplicate register → $DUP (want 409)"
+          SHORT=$(curl -s -o /dev/null -w '%{http_code}' -X POST $B/auth/register -H 'Content-Type: application/json' -d '{"name":"shorty","password":"ab"}')
+          [ "$SHORT" = '400' ] || fail "short password → $SHORT (want 400)"
+          WP=$(curl -s -o /dev/null -w '%{http_code}' -X POST $B/auth/login -H 'Content-Type: application/json' -d '{"name":"alice","password":"wrong-pass"}')
+          [ "$WP" = '401' ] || fail "wrong password login → $WP (want 401)"
+          TA2=$(curl -s -X POST $B/auth/login -H 'Content-Type: application/json' -d '{"name":"alice","password":"wonder1"}' | J token)
+          [ -n "$TA2" ] && [ "$TA2" != "$TA" ] || fail 're-login did not mint a fresh token'
+          echo "smoke: register/login validation ok"
+
+          # ---- data isolation: each account writes and reads back only its own save
+          curl -sf -X PUT $B/profile -H "Authorization: Bearer $TA" -H 'Content-Type: application/json' \
+            -d '{"data":{"settings":{"quality":"high"},"profile":{"name":"alice-save","level":9}}}' >/dev/null || fail 'alice PUT profile'
+          curl -sf -X PUT $B/profile -H "Authorization: Bearer $TB" -H 'Content-Type: application/json' \
+            -d '{"data":{"settings":{"quality":"low"},"profile":{"name":"bob-save","level":4}}}' >/dev/null || fail 'bob PUT profile'
+          PA=$(curl -sf $B/profile -H "Authorization: Bearer $TA") || fail 'alice GET profile'
+          PB=$(curl -sf $B/profile -H "Authorization: Bearer $TB") || fail 'bob GET profile'
+          echo "$PA" | grep -q 'alice-save' || fail "alice got no alice-save: $PA"
+          ! echo "$PA" | grep -q 'bob-save' || fail "DATA LEAK: alice can see bob's save"
+          echo "$PB" | grep -q 'bob-save' || fail "bob got no bob-save: $PB"
+          ! echo "$PB" | grep -q 'alice-save' || fail "DATA LEAK: bob can see alice's save"
+          echo "$PA" | grep -q '"quality":"high"' || fail 'alice settings blob wrong'
+          echo "$PB" | grep -q '"quality":"low"' || fail 'bob settings blob wrong'
+          NT=$(curl -s -o /dev/null -w '%{http_code}' $B/profile)
+          [ "$NT" = '401' ] || fail "no-token GET → $NT (want 401)"
+          BT=$(curl -s -o /dev/null -w '%{http_code}' $B/profile -H 'Authorization: Bearer deadbeef')
+          [ "$BT" = '401' ] || fail "bogus-token GET → $BT (want 401)"
+          # a token minted by the re-login must read the same account data
+          PA2=$(curl -sf $B/profile -H "Authorization: Bearer $TA2")
+          echo "$PA2" | grep -q 'alice-save' || fail "second token lost data visibility: $PA2"
+          echo "smoke: account isolation + auth ok"
+
+          # ---- volume persistence: destroy the container entirely, recreate on the SAME volume,
+          #      accounts + saves + tokens must all still be there
+          docker rm -f inkwave >/dev/null
+          docker run -d --name inkwave -p 8490:8490 -p 8787:8787 \
+            -v inkwave-data:/app/server/.wrangler/state "$IMAGE"
+          for i in $(seq 1 30); do curl -sf $B/health >/dev/null 2>&1 && break || sleep 2; done
+          PA3=$(curl -sf $B/profile -H "Authorization: Bearer $TA") || fail 'alice GET after container recreation'
+          echo "$PA3" | grep -q 'alice-save' || fail "PERSISTENCE BROKEN after container recreation: $PA3"
+          echo "smoke: volume persistence across container recreation ok"
+          echo "ALL SMOKE TESTS PASSED"
+          docker logs inkwave 2>&1 | tail -12
