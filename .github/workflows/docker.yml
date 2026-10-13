@@ -74,6 +74,8 @@ jobs:
 
           docker volume create inkwave-data >/dev/null
           docker run -d --name inkwave -p 8490:8490 -p 8787:8787 \
+            -e RELAY_PUBLIC_URL=wss://demo.example.com:23456 \
+            -e RELAY_EXTRA_ORIGIN=https://page.example.com:9999 \
             -v inkwave-data:/app/server/.wrangler/state "$IMAGE"
           for i in $(seq 1 30); do
             curl -sf -o /dev/null http://127.0.0.1:8490/ && break || sleep 2
@@ -88,6 +90,19 @@ jobs:
           CODE=$(curl -s -o /dev/null -w '%{http_code}' --max-time 10 $B/)
           [ "$CODE" != "000" ] || fail 'relay port not answering'
           echo "smoke: web served, relay alive (HTTP $CODE)"
+
+          # ---- relay discovery + origin whitelist (reverse-proxy deployments: nginx/Lucky/…)
+          RV=$(curl -sf http://127.0.0.1:8490/relay.txt) || fail '/relay.txt 404 with RELAY_PUBLIC_URL set'
+          [ "$RV" = 'wss://demo.example.com:23456' ] || fail "/relay.txt got '$RV'"
+          WS_OK=$(curl -si --max-time 8 -H 'Connection: Upgrade' -H 'Upgrade: websocket' -H 'Sec-WebSocket-Version: 13' \
+            -H 'Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==' -H 'Origin: https://page.example.com:9999' \
+            "$B/room/SMOKETEST" | head -1 | tr -d '\r')
+          echo "$WS_OK" | grep -q '101' || fail "WS with whitelisted origin → $WS_OK (want 101; error frames arrive on the socket)"
+          WS_BAD=$(curl -si --max-time 8 -H 'Connection: Upgrade' -H 'Upgrade: websocket' -H 'Sec-WebSocket-Version: 13' \
+            -H 'Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==' -H 'Origin: https://evil.example.net' \
+            "$B/room/SMOKETEST" | head -1 | tr -d '\r')
+          echo "$WS_BAD" | grep -q '403' || fail "WS with unknown origin → $WS_BAD (want 403)"
+          echo "smoke: RELAY_PUBLIC_URL served + origin whitelist ok"
 
           # ---- CORS preflight (game page :8490 → relay :8787 is cross-origin)
           OPT=$(curl -s -o /dev/null -w '%{http_code}' -X OPTIONS $B/auth/login -H 'Origin: http://192.168.1.50:8490' -H 'Access-Control-Request-Method: POST')
@@ -141,6 +156,8 @@ jobs:
           for i in $(seq 1 30); do curl -sf $B/health >/dev/null 2>&1 && break || sleep 2; done
           PA3=$(curl -sf $B/profile -H "Authorization: Bearer $TA") || fail 'alice GET after container recreation'
           echo "$PA3" | grep -q 'alice-save' || fail "PERSISTENCE BROKEN after container recreation: $PA3"
-          echo "smoke: volume persistence across container recreation ok"
+          RC=$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8490/relay.txt)
+          [ "$RC" = '404' ] || fail "/relay.txt without env → $RC (want 404)"
+          echo "smoke: volume persistence across container recreation ok (relay.txt correctly absent without env)"
           echo "ALL SMOKE TESTS PASSED"
           docker logs inkwave 2>&1 | tail -12

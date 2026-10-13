@@ -4,15 +4,35 @@
 
 export const PROTO = 1;
 
-// Where the relay lives: ?relay=… wins; a page served from this machine or the LAN talks to a local `wrangler dev`
-// relay on :8787; the public site talks to the deployed Worker.
+// Where the relay lives, in priority order:
+//   1. ?relay=…          (explicit, wins over everything)
+//   2. LAN auto-detect   a page served from this machine or the LAN talks to a local `wrangler dev` on :8787
+//   3. /relay.txt        self-host config: the Docker image serves RELAY_PUBLIC_URL (compose env) here, so a
+//                        reverse-proxied domain (nginx/Lucky, arbitrary external ports) reaches its own relay
+//                        with zero URL parameters — boot() awaits initRelayConfig() once before anything dials
+//   4. the public site   falls back to the deployed Worker
 export const PROD_RELAY = 'wss://inkwave-net.inkwave.workers.dev';
+let CONFIGURED;
+export async function initRelayConfig() {
+  if (CONFIGURED !== undefined) return CONFIGURED;
+  const ctrl = typeof AbortController !== 'undefined' ? new AbortController() : null;
+  const timer = ctrl ? setTimeout(() => ctrl.abort(), 3000) : null;
+  try {
+    const r = await fetch('relay.txt', { cache: 'no-store', signal: ctrl && ctrl.signal });
+    const t = r.ok ? (await r.text()).trim() : '';
+    CONFIGURED = /^wss?:\/\/\S+$/.test(t) ? t.replace(/\/$/, '') : '';
+  } catch { CONFIGURED = ''; }
+  finally { if (timer) clearTimeout(timer); }
+  return CONFIGURED;
+}
 export function relayURL() {
   const q = new URLSearchParams(location.search).get('relay');
   if (q) return q.replace(/\/$/, '');
   const h = location.hostname;
   const local = h === 'localhost' || h === '127.0.0.1' || h === '[::1]' || /^(10|192\.168|172\.(1[6-9]|2\d|3[01]))\./.test(h) || h.endsWith('.local');
-  return local ? `ws://${h}:8787` : PROD_RELAY;
+  if (local) return `ws://${h}:8787`;
+  if (CONFIGURED) return CONFIGURED;
+  return PROD_RELAY;
 }
 
 // Debug: simulate a real connection on localhost — ?netlag=ms (extra one-way delay on everything received),

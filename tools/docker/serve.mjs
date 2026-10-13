@@ -28,6 +28,16 @@ const server = http.createServer((req, res) => {
   catch { res.writeHead(400).end('bad request'); return; }
   if (pathname.includes('\0') || pathname.includes('..')) { notFound(res, pathname); return; }
   if (pathname === '/') pathname = '/index.html';
+  // self-host relay discovery: RELAY_PUBLIC_URL (compose env) is served here and read once by the
+  // client at boot (src/net/transport.js initRelayConfig) — so reverse-proxied domains reach the
+  // relay with zero URL parameters. Unset env → 404, and the client keeps its defaults.
+  if (pathname === '/relay.txt') {
+    const url = (process.env.RELAY_PUBLIC_URL || '').trim();
+    if (!url) { notFound(res, pathname); return; }
+    res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8', 'Cache-Control': 'no-cache' });
+    res.end(url + '\n');
+    return;
+  }
 
   let file = path.join(ROOT, pathname);
   let stat;

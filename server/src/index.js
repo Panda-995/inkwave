@@ -23,8 +23,20 @@ import { DurableObject } from 'cloudflare:workers';
 const PROTO = 1, MAX = 8;
 // Public relay hygiene: only the game's own site may open rooms (plus local dev), each socket gets a message budget
 // (the game sends ~25/s; a runaway or hostile client is cut off before it can eat the account's quota) and a size cap.
-const ORIGIN_OK = (o) => /^https:\/\/([a-z0-9-]+\.)?inkwave-aah\.pages\.dev$/.test(o)
-  || /^https?:\/\/(localhost|127\.0\.0\.1|10\.\d+\.\d+\.\d+|192\.168\.\d+\.\d+|172\.(1[6-9]|2\d|3[01])\.\d+\.\d+|[a-z0-9-]+\.local)(:\d+)?$/.test(o);   // dev + LAN play
+// Self-hosted behind a reverse proxy (nginx/Lucky/…): the page's own origin is allowed two ways —
+//   • origin host === request Host (same-origin path proxy), or
+//   • RELAY_EXTRA_ORIGIN env (wrangler --var; comma list of exact origins) for setups where the relay
+//     lives on a DIFFERENT origin than the page (e.g. Lucky exposes the relay on its own external port).
+const LAN_ORIGIN = /^https?:\/\/(localhost|127\.0\.0\.1|10\.\d+\.\d+\.\d+|192\.168\.\d+\.\d+|172\.(1[6-9]|2\d|3[01])\.\d+\.\d+|[a-z0-9-]+\.local)(:\d+)?$/;
+function ORIGIN_OK(o, req, env) {
+  if (/^https:\/\/([a-z0-9-]+\.)?inkwave-aah\.pages\.dev$/.test(o)) return true;
+  if (LAN_ORIGIN.test(o)) return true;
+  try {
+    if (req.headers.get('host') && new URL(o).host === req.headers.get('host')) return true;
+  } catch { /* malformed origin */ }
+  const extra = String((env && env.RELAY_EXTRA_ORIGIN) || '').split(',').map((s) => s.trim()).filter(Boolean);
+  return extra.includes(o);
+}
 const MSG_MAX = 65536, RATE = 90, BURST_STRIKES = 4;
 // A socket whose "ping"s stop is a player whose connection died without closing (Wi-Fi gone, laptop lid shut): drop
 // them so their squidkid is handed to a bot instead of standing frozen. Clients ping every 2 s; a hidden tab still
@@ -44,7 +56,7 @@ export default {
     const code = m[1].toUpperCase();
     if (!CODE.test(code)) return new Response('bad code', { status: 400 });
     if (req.headers.get('Upgrade') !== 'websocket') return new Response('expected websocket', { status: 426 });
-    if (!ORIGIN_OK(req.headers.get('Origin') || '')) return new Response('forbidden', { status: 403 });
+    if (!ORIGIN_OK(req.headers.get('Origin') || '', req, env)) return new Response('forbidden', { status: 403 });
     return env.ROOMS.get(env.ROOMS.idFromName(code)).fetch(req);
   },
 };

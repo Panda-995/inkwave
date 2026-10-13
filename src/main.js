@@ -31,6 +31,7 @@ import { Showcase } from './game/showcase.js';
 import { ZoneMarks } from './fx/zoneMarks.js';
 import { BOSS_MODE } from './boss/bossMode.js';
 import * as accounts from './net/accounts.js';
+import { initRelayConfig } from './net/transport.js';
 
 const params = new URLSearchParams(location.search);
 // dev-only: ?devstage lets an online-only stage (config onlineOnly — Cargo Terminal) boot as the backdrop and be walked
@@ -75,6 +76,7 @@ async function loadModule(path, stubName) {
 class Game {
   async boot() {
     const t0 = performance.now();
+    await initRelayConfig();   // self-host: pick up RELAY_PUBLIC_URL (/relay.txt) before anything dials the relay
     await this._cloudRestore();   // signed in? pull the cloud save before anything reads it
     this._cloudSyncInit();
     // real top-down thumbnails for the stage cards, generated from each layout's geometry

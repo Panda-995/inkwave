@@ -7,7 +7,9 @@ set -u
 
 node /app/tools/docker/serve.mjs & serve_pid=$!
 cd /app/server
-wrangler dev --ip 0.0.0.0 --port 8787 & relay_pid=$!
+# RELAY_EXTRA_ORIGIN (comma list) → wrangler --var so the relay's Origin whitelist accepts reverse-
+# proxied page origins (Lucky/nginx expose page and relay on different origins by default)
+wrangler dev --ip 0.0.0.0 --port 8787 ${RELAY_EXTRA_ORIGIN:+--var RELAY_EXTRA_ORIGIN:"$RELAY_EXTRA_ORIGIN"} & relay_pid=$!
 
 term() { kill "$serve_pid" "$relay_pid" 2>/dev/null; wait; exit 0; }
 trap term TERM INT
