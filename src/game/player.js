@@ -218,7 +218,7 @@ export class PlayerController {
     const why = this._queueGone(q);
     let ok = false;
     if (!why) ok = q.kind === 'beacon' ? !!G.subs?.jumpToBeacon(a, q.target) : a.superJump(q.target);
-    if (!ok) { G.hud?.jumpNote?.(`${why || 'Can’t Super Jump right now'} — Super Jump cancelled`); G.audio?.play('ui_error', { volume: 0.45 }); }
+    if (!ok) { G.hud?.jumpNote?.(`${why || '现在无法超级跳跃'}——超级跳跃已取消`); G.audio?.play('ui_error', { volume: 0.45 }); }
     return ok;
   }
 
