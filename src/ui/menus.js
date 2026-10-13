@@ -26,6 +26,7 @@ import {
 import { bossSilhouette, bossEmblem, BOSS_GLYPH, BOSS_NAME, BOSS_EPITHET } from './boss-art.js';
 import { WhatsNew } from './news.js';
 import * as accounts from '../net/accounts.js';
+import { relayURL, PROD_RELAY } from '../net/transport.js';
 
 const SCREENS = ['loading', 'title', 'main', 'mode', 'loadout', 'setup', 'locker', 'settings', 'howto', 'credits', 'pause', 'results', 'online', 'lobby', 'account'];
 // Transitions that get the full-screen ink wipe (the rest use staggered pop-ins).
@@ -933,6 +934,12 @@ export class Menus {
   _scr_account() {
     const acc = accounts.current();
     const body = h('div', { class: 'iw-hub__body iw-acct__body' });
+    // the account endpoints only exist on YOUR relay: a page that fell back to the public demo relay
+    // (bare-hostname access) can show menus but can never sign in — say so instead of failing opaquely
+    if (relayURL() === PROD_RELAY) {
+      body.append(h('span', { class: 'iw-acct__warn' },
+        '当前页面连的是公网演示中继，没有账号功能。请用 IP 访问你自己的 NAS（如 http://192.168.x.x:8490），或在地址后加 ?relay=ws://<NAS_IP>:8787。'));
+    }
 
     if (acc) {
       // ---- signed in: identity + manual sync controls (everything else syncs automatically)
@@ -987,6 +994,7 @@ export class Menus {
       h('div', { class: 'iw-scrim-left' }),
       this._header('账号', { sub: '存档随账号走 · 数据保存在你的中继里' }),
       body,
+      h('div', { class: 'iw-corner iw-corner--br iw-in' }, `中继 ${relayURL()}`),
       this._prompts([['Esc', 'B', '返回']]));
     return { el, initial: '[data-id]' };
   }

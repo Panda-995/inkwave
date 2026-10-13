@@ -50,6 +50,9 @@ async function call(path, { method = 'GET', token, body } = {}) {
     return data;
   } catch (e) {
     if (e.name === 'AbortError') throw new Error('中继没有响应，请确认服务在运行');
+    // fetch()'s raw TypeError ("Failed to fetch") means the request never completed: relay down, old
+    // image without the account endpoints, or the page is on the public demo relay (hostname access)
+    if (e instanceof TypeError) throw new Error('连不上中继：请确认 NAS 上的容器已更新且 8787 端口可达；若用主机名访问本页，请在地址后加 ?relay=ws://<NAS_IP>:8787');
     throw e;
   } finally { clearTimeout(timer); }
 }
